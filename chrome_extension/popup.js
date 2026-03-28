@@ -1,4 +1,5 @@
-// popup.js
+// popup.js — reads persistent state from chrome.storage
+// Camera runs in content.js, popup just displays the live data
 
 // ── Elements ──────────────────────────────────────────────────────────────────
 const webcamFeed      = document.getElementById('webcamFeed');
@@ -21,78 +22,67 @@ const openWebAppBtn   = document.getElementById('openWebAppBtn');
 const syncBtn         = document.getElementById('syncBtn');
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let sessionActive  = false;
-let confusionScore = 0;
-let lastSpikeTime  = 0;
-let pomoMinutes    = 25;
-let pomoSecondsLeft= 25 * 60;
-let pomoRunning    = false;
-let pomoInterval   = null;
-let detectionLoop  = null;
-let prevFrame      = null;
+let sessionActive   = false;
+let pomoMinutes     = 25;
+let pomoSecondsLeft = 25 * 60;
+let pomoRunning     = false;
 
-const videoCanvas = document.createElement('canvas');
-const ctx2d       = videoCanvas.getContext('2d');
-
-// ── Load session ──────────────────────────────────────────────────────────────
-async function loadSession() {
-  const res = await chrome.runtime.sendMessage({ type: 'GET_SESSION' });
-  if (res.success) updateStatsUI(res.session);
-}
-
-function updateStatsUI(session) {
-  statSpikes.textContent = session.confusionSpikes || 0;
-  statFocus.textContent  = session.focusScore      || 100;
-  statCards.textContent  = session.cardsDone        || 0;
-  pomoDone.textContent   = `${session.pomodorosDone || 0} done today`;
-  sessionActive          = session.active || false;
-  updateSessionUI();
-}
-
-function updateSessionUI() {
-  if (sessionActive) {
-    sessionDot.className      = 'dot green';
-    sessionStatus.textContent = 'Session active';
-    toggleSessionBtn.textContent = 'Stop';
-  } else {
-    sessionDot.className      = 'dot';
-    sessionStatus.textContent = 'Session inactive';
-    toggleSessionBtn.textContent = 'Start';
+// ── Load persistent state from storage on open ────────────────────────────────
+chrome.storage.local.get(['session', 'timerSecs', 'confScore', 'pomoMinutes', 'pomoRunning'], (res) => {
+  // Restore timer
+  if (res.timerSecs !== undefined) {
+    pomoSecondsLeft = res.timerSecs;
+    renderTimer(pomoSecondsLeft);
   }
-}
-
-// ── Session toggle ────────────────────────────────────────────────────────────
-toggleSessionBtn.addEventListener('click', async () => {
-  if (sessionActive) {
-    await chrome.runtime.sendMessage({ type: 'STOP_SESSION' });
-    sessionActive = false;
-    stopWebcam();
-  } else {
-    await chrome.runtime.sendMessage({ type: 'START_SESSION' });
-    sessionActive = true;
-    startWebcam();
+  if (res.pomoMinutes) {
+    pomoMinutes = res.pomoMinutes;
   }
-  updateSessionUI();
+  if (res.pomoRunning) {
+    pomoRunning = res.pomoRunning;
+    pomoStartBtn.textContent = pomoRunning ? '⏸ Pause' : '▶ Start';
+  }
+
+  // Restore session
+  if (res.session) {
+    sessionActive = res.session.active || false;
+    updateSessionUI();
+    updateStatsUI(res.session);
+  }
+
+  // Restore confusion score
+  if (res.confScore !== undefined) {
+    updateConfusionUI(res.confScore);
+  }
+
+  // Show camera feed from content.js stream
+  startPopupCamera();
 });
 
-// ── Webcam — uses offscreen API workaround ────────────────────────────────────
-async function startWebcam() {
+// ── Poll storage every 500ms to stay in sync with content.js ─────────────────
+setInterval(() => {
+  chrome.storage.local.get(['timerSecs', 'confScore', 'session'], (res) => {
+    if (res.timerSecs !== undefined) {
+      pomoSecondsLeft = res.timerSecs;
+      renderTimer(pomoSecondsLeft);
+    }
+    if (res.confScore !== undefined) {
+      updateConfusionUI(res.confScore);
+    }
+    if (res.session) {
+      updateStatsUI(res.session);
+    }
+  });
+}, 500);
+
+// ── Start popup's own camera feed (mirrors content.js stream) ─────────────────
+async function startPopupCamera() {
   try {
-    // Chrome extensions need getUserMedia called from a tab context.
-    // We inject a tiny script into the active tab to request camera,
-    // then pipe frames via captureStream.
     const stream = await navigator.mediaDevices.getUserMedia({
       video: { width: 320, height: 240, facingMode: 'user' }
     });
     webcamFeed.srcObject = stream;
-    webcamFeed.onloadedmetadata = () => {
-      videoCanvas.width  = webcamFeed.videoWidth;
-      videoCanvas.height = webcamFeed.videoHeight;
-      startDetectionLoop();
-    };
     camError.style.display = 'none';
-  } catch (e) {
-    // Show helpful message with link to grant permission
+  } catch(e) {
     camError.innerHTML = `
       Camera blocked. 
       <a href="chrome://settings/content/camera" target="_blank" 
@@ -103,65 +93,43 @@ async function startWebcam() {
   }
 }
 
-function stopWebcam() {
-  if (webcamFeed.srcObject) {
-    webcamFeed.srcObject.getTracks().forEach(t => t.stop());
-    webcamFeed.srcObject = null;
+// ── Session toggle — tells content.js to start/stop camera ───────────────────
+toggleSessionBtn.addEventListener('click', async () => {
+  if (sessionActive) {
+    await chrome.runtime.sendMessage({ type: 'STOP_SESSION' });
+    // Broadcast to all tabs
+    const tabs = await chrome.tabs.query({});
+    tabs.forEach(tab => chrome.tabs.sendMessage(tab.id, { type: 'STOP_SESSION' }).catch(() => {}));
+    sessionActive = false;
+  } else {
+    await chrome.runtime.sendMessage({ type: 'START_SESSION' });
+    // Broadcast to all tabs
+    const tabs = await chrome.tabs.query({});
+    tabs.forEach(tab => chrome.tabs.sendMessage(tab.id, { type: 'START_SESSION' }).catch(() => {}));
+    sessionActive = true;
+    startPopupCamera();
   }
-  if (detectionLoop) clearInterval(detectionLoop);
-}
+  updateSessionUI();
+});
 
-// ── Confusion detection ───────────────────────────────────────────────────────
-function analyzeFrame() {
-  if (!webcamFeed.srcObject || webcamFeed.readyState < 2) return;
-  ctx2d.drawImage(webcamFeed, 0, 0, videoCanvas.width, videoCanvas.height);
-
-  const w = videoCanvas.width;
-  const h = videoCanvas.height;
-
-  let imageData;
-  try {
-    imageData = ctx2d.getImageData(
-      Math.floor(w*0.25), Math.floor(h*0.15),
-      Math.floor(w*0.5),  Math.floor(h*0.7)
-    );
-  } catch(e) { return; }
-
-  const pixels = imageData.data;
-  const n = pixels.length / 4;
-  let brightness = 0, motionDelta = 0;
-
-  for (let i = 0; i < pixels.length; i += 4) {
-    brightness += (pixels[i] + pixels[i+1] + pixels[i+2]) / 3;
-  }
-  brightness /= n;
-
-  if (prevFrame && prevFrame.length === pixels.length) {
-    for (let i = 0; i < pixels.length; i += 4) {
-      motionDelta += Math.abs(pixels[i] - prevFrame[i]);
-    }
-    motionDelta /= n;
-  }
-  prevFrame = new Uint8Array(pixels);
-
-  const brightScore = brightness < 80 ? 0.6 : brightness < 120 ? 0.3 : 0.0;
-  const motionScore = motionDelta > 15 ? 0.5 : motionDelta > 8 ? 0.2 : 0.0;
-  const rawScore    = Math.min(1.0, brightScore + motionScore + Math.random() * 0.08);
-
-  confusionScore = confusionScore * 0.85 + rawScore * 0.15;
-  updateConfusionUI(confusionScore);
-
-  const now = Date.now();
-  if (confusionScore > 0.65 && (now - lastSpikeTime) > 20000 && sessionActive) {
-    lastSpikeTime = now;
-    chrome.runtime.sendMessage({ type: 'CONFUSION_SPIKE', score: confusionScore });
-    loadSession();
+// ── UI helpers ────────────────────────────────────────────────────────────────
+function updateSessionUI() {
+  if (sessionActive) {
+    sessionDot.className         = 'dot green';
+    sessionStatus.textContent    = 'Session active';
+    toggleSessionBtn.textContent = 'Stop';
+  } else {
+    sessionDot.className         = 'dot';
+    sessionStatus.textContent    = 'Session inactive';
+    toggleSessionBtn.textContent = 'Start';
   }
 }
 
-function startDetectionLoop() {
-  if (detectionLoop) clearInterval(detectionLoop);
-  detectionLoop = setInterval(analyzeFrame, 300);
+function updateStatsUI(session) {
+  statSpikes.textContent = session.confusionSpikes || 0;
+  statFocus.textContent  = session.focusScore      || 100;
+  statCards.textContent  = session.cardsDone        || 0;
+  pomoDone.textContent   = `${session.pomodorosDone || 0} done today`;
 }
 
 function updateConfusionUI(score) {
@@ -186,52 +154,40 @@ document.querySelectorAll('.pomo-len-btn').forEach(btn => {
     pomoMinutes     = parseInt(btn.dataset.min);
     pomoSecondsLeft = pomoMinutes * 60;
     pomoRunning     = false;
-    clearInterval(pomoInterval);
     pomoStartBtn.textContent = '▶ Start';
-    renderTimer();
+    chrome.storage.local.set({ pomoMinutes, pomoRunning: false });
+    chrome.runtime.sendMessage({ type: 'STOP_POMODORO' });
+    renderTimer(pomoSecondsLeft);
   });
 });
 
-function renderTimer() {
-  const m = Math.floor(pomoSecondsLeft/60).toString().padStart(2,'0');
-  const s = (pomoSecondsLeft%60).toString().padStart(2,'0');
+function renderTimer(secs) {
+  const m = Math.floor(secs/60).toString().padStart(2,'0');
+  const s = (secs%60).toString().padStart(2,'0');
   pomoTimer.textContent = `${m}:${s}`;
 }
 
 pomoStartBtn.addEventListener('click', () => {
   if (pomoRunning) {
-    clearInterval(pomoInterval);
     pomoRunning = false;
     pomoStartBtn.textContent = '▶ Resume';
+    chrome.storage.local.set({ pomoRunning: false });
     chrome.runtime.sendMessage({ type: 'STOP_POMODORO' });
   } else {
     pomoRunning = true;
     pomoStartBtn.textContent = '⏸ Pause';
+    chrome.storage.local.set({ pomoRunning: true, pomoMinutes });
     chrome.runtime.sendMessage({ type: 'START_POMODORO', minutes: pomoMinutes });
-    pomoInterval = setInterval(() => {
-      if (pomoSecondsLeft <= 0) {
-        clearInterval(pomoInterval);
-        pomoRunning = false;
-        pomoStartBtn.textContent = '▶ Start';
-        pomoSecondsLeft = pomoMinutes * 60;
-        renderTimer();
-        loadSession();
-        return;
-      }
-      pomoSecondsLeft--;
-      renderTimer();
-      chrome.storage.local.set({ timerSecs: pomoSecondsLeft, confScore: confusionScore });
-    }, 1000);
   }
 });
 
 pomoResetBtn.addEventListener('click', () => {
-  clearInterval(pomoInterval);
   pomoRunning     = false;
   pomoSecondsLeft = pomoMinutes * 60;
   pomoStartBtn.textContent = '▶ Start';
-  renderTimer();
+  chrome.storage.local.set({ pomoRunning: false, timerSecs: pomoSecondsLeft });
   chrome.runtime.sendMessage({ type: 'STOP_POMODORO' });
+  renderTimer(pomoSecondsLeft);
 });
 
 // ── Open web app ──────────────────────────────────────────────────────────────
@@ -251,12 +207,4 @@ syncBtn.addEventListener('click', async () => {
       syncBtn.disabled = false;
     }, 1500);
   }, 500);
-});
-
-// ── Init ──────────────────────────────────────────────────────────────────────
-setInterval(loadSession, 3000);
-loadSession();
-renderTimer();
-chrome.storage.local.get(['session'], (res) => {
-  if (res.session?.active) startWebcam();
 });
