@@ -14,6 +14,9 @@ import os, json, re
 from pathlib import Path
 from typing import Optional
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -29,6 +32,8 @@ except ImportError:
     print("[server] google-genai not installed. Run: pip install google-genai")
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+if not GEMINI_API_KEY:
+    print("[server] WARNING: GEMINI_API_KEY not set. Create a .env file with GEMINI_API_KEY=your_key")
 SESSION_FILE   = Path("/tmp/studybuddy_session.json")
 
 app = FastAPI(title="StudyBuddy API")
@@ -53,7 +58,7 @@ def call_gemini(prompt: str) -> str:
         raise HTTPException(400, "GEMINI_API_KEY not set. Run: export GEMINI_API_KEY=your_key")
     client   = genai.Client(api_key=GEMINI_API_KEY)
     response = client.models.generate_content(
-        model="gemini-2.0-flash",
+        model="gemini-2.5-flash",
         contents=prompt,
     )
     return response.text
