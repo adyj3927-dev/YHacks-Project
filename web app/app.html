@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StudyBuddy</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Noto+Sans+Arabic&family=Noto+Sans+Devanagari&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#0d0d12; --surface:#13131a; --surface2:#1a1a24;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --text:#e8e6f0; --muted:#7a7890; --accent:#c9a96e; --accent2:#e8c99a;
+  --green:#6fcf97; --orange:#f2994a; --red:#eb5757; --purple:#bb9af7;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans','Noto Sans Arabic','Noto Sans Devanagari',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;}
+.shell{display:flex;min-height:100vh;position:relative;z-index:1;}
+
+/* Sidebar */
+.sidebar{width:230px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:26px 18px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--accent);letter-spacing:.04em;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .18s;border:none;background:none;width:100%;text-align:left;}
+.nav-item:hover{background:var(--surface2);color:var(--text);}
+.nav-item.active{background:rgba(201,169,110,.12);color:var(--accent);}
+.nav-item .icon{font-size:15px;width:18px;}
+.sb-section{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:14px 0 6px 12px;}
+.sb-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;width:100%;outline:none;transition:border .18s;}
+.sb-input:focus{border-color:var(--accent);}
+.sb-select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px;width:100%;outline:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.detect-btn{width:100%;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:11px;cursor:pointer;margin-top:5px;transition:all .18s;font-family:'DM Sans',sans-serif;}
+.detect-btn:hover{border-color:var(--accent);color:var(--accent);}
+.sb-stats{font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;margin-top:auto;}
+.sb-stats span{color:var(--text);}
+
+/* Main */
+.main{flex:1;padding:36px 40px;max-width:900px;}
+h1{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;color:var(--text);margin-bottom:4px;letter-spacing:.01em;}
+.subtitle{font-size:13px;color:var(--muted);margin-bottom:26px;}
+.page{display:none;} .page.active{display:block;}
+
+/* Source grid */
+.src-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;}
+.src-card{padding:12px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;transition:all .18s;font-size:12px;color:var(--muted);}
+.src-card:hover{border-color:var(--border2);color:var(--text);}
+.src-card.active{border-color:var(--accent);color:var(--accent);background:rgba(201,169,110,.06);}
+.src-card .si{font-size:20px;margin-bottom:5px;}
+
+textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:120px;outline:none;transition:border .18s;line-height:1.6;}
+textarea:focus{border-color:var(--accent);}
+
+.gen-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,#c9a96e,#e8c99a);color:#0d0d12;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:12px;transition:all .2s;letter-spacing:.02em;}
+.gen-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(201,169,110,.25);}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
+
+/* Loader */
+.loader{display:none;text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+.loader.on{display:block;}
+.spinner{width:30px;height:30px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* Study set */
+.summary{background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.2);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.7;color:var(--muted);margin-bottom:18px;font-style:italic;display:none;}
+.summary.on{display:block;}
+.inner-tabs{display:flex;gap:6px;margin-bottom:14px;}
+.itab{padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.itab:hover{border-color:var(--border2);color:var(--text);}
+.itab.active{background:var(--accent);color:#0d0d12;border-color:var(--accent);font-weight:500;}
+
+/* Flashcard */
+.fc-wrap{perspective:1000px;height:160px;cursor:pointer;margin-bottom:10px;}
+.fc-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,0,.2,1);}
+.fc-inner.flipped{transform:rotateY(180deg);}
+.fc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:14px;padding:20px 24px;display:flex;flex-direction:column;justify-content:center;}
+.fc-front{background:var(--surface2);border:1px solid var(--border);}
+.fc-back{background:linear-gradient(135deg,#1a1408,#2a2010);border:1px solid rgba(201,169,110,.25);transform:rotateY(180deg);}
+.fc-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;}
+.fc-txt{font-size:15px;line-height:1.5;color:var(--text);}
+.fc-hint{font-size:12px;color:var(--accent);margin-top:10px;font-style:italic;}
+.fc-tap{font-size:11px;color:var(--muted);text-align:center;margin-bottom:7px;}
+.fc-ctr{font-size:11px;color:var(--muted);text-align:right;margin-bottom:6px;}
+.fc-nav{display:flex;gap:8px;}
+.fcbtn{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center;}
+.fcbtn:hover{border-color:var(--border2);color:var(--text);}
+.fcbtn.got{background:rgba(111,207,151,.1);color:var(--green);border-color:rgba(111,207,151,.3);}
+
+/* MCQ */
+.mcq-q{font-size:14px;color:var(--text);margin-bottom:12px;line-height:1.5;}
+.mcq-ctr{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.mcq-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);font-size:13px;cursor:pointer;margin-bottom:6px;transition:all .15s;line-height:1.5;}
+.mcq-opt:hover{border-color:var(--border2);}
+.mcq-opt.correct{background:rgba(111,207,151,.08);border-color:rgba(111,207,151,.3);color:var(--green);}
+.mcq-opt.wrong{background:rgba(235,87,87,.08);border-color:rgba(235,87,87,.3);color:var(--red);}
+.mcq-ltr{font-weight:500;color:var(--accent);min-width:16px;}
+.mcq-exp{margin-top:10px;padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);font-size:12px;color:var(--muted);line-height:1.6;display:none;}
+.mcq-exp.on{display:block;}
+.mcq-next{width:100%;margin-top:10px;padding:9px;border-radius:8px;background:rgba(201,169,110,.1);border:1px solid rgba(201,169,110,.25);color:var(--accent);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;transition:all .15s;}
+.mcq-next:hover{background:rgba(201,169,110,.18);}
+.mcq-next.on{display:block;}
+
+/* Dashboard */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px;}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 14px;text-align:center;}
+.m-val{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--accent);font-weight:600;}
+.m-lbl{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em;}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.dash-ttl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;}
+.spike-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);}
+.s-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.s-time{color:var(--text);min-width:56px;}
+.focus-bg{background:var(--surface2);border-radius:6px;height:10px;margin:8px 0;}
+.focus-fill{border-radius:6px;height:10px;transition:width .6s;}
+.pomo-row{font-size:22px;letter-spacing:3px;margin:8px 0;}
+.big-num{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--purple);}
+
+.empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.e-icon{font-size:48px;margin-bottom:14px;opacity:.5;}
+.e-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--text);margin-bottom:8px;}
+.e-sub{font-size:13px;line-height:1.6;}
+
+.chart-svg{width:100%;overflow:visible;}
+
+/* Error */
+.err-box{background:rgba(235,87,87,.08);border:1px solid rgba(235,87,87,.25);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--red);margin-top:10px;display:none;}
+.err-box.on{display:block;}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;z-index:1000;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;color:var(--text);transform:translateY(80px);opacity:0;transition:all .3s;max-width:260px;}
+.toast.on{transform:translateY(0);opacity:1;}
+
+/* RTL */
+.rtl{direction:rtl;text-align:right;}
+
+input[type=file]{display:none;}
+.file-lbl{display:block;padding:10px;border-radius:8px;border:1px dashed var(--border2);color:var(--muted);font-size:12px;text-align:center;cursor:pointer;transition:all .15s;margin-top:8px;}
+.file-lbl:hover{border-color:var(--accent);color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="logo">📖 StudyBuddy</div>
+  <button class="nav-item active" onclick="showPage('flashcards')"><span class="icon">🎴</span>Flashcards</button>
+  <button class="nav-item" onclick="showPage('dashboard')"><span class="icon">📊</span>Dashboard</button>
+
+  <div class="sb-section">Language</div>
+  <select class="sb-select" id="langSelect" onchange="onLangChange()">
+    <option value="English">🇺🇸 English</option>
+    <option value="Hindi">🇮🇳 Hindi — हिन्दी</option>
+    <option value="Urdu">🇵🇰 Urdu — اردو</option>
+    <option value="Arabic">🇸🇦 Arabic — العربية</option>
+    <option value="French">🇫🇷 French</option>
+    <option value="Spanish">🇪🇸 Spanish</option>
+    <option value="Mandarin">🇨🇳 Mandarin</option>
+  </select>
+  <button class="detect-btn" onclick="detectLang()">🔍 Auto-detect language</button>
+
+  <div class="sb-section" style="margin-top:auto">Session</div>
+  <div class="sb-stats">
+    Cards done: <span id="sb-cards">0</span><br>
+    Spikes: <span id="sb-spikes">0</span>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="main">
+
+  <!-- FLASHCARDS PAGE -->
+  <div id="page-flashcards" class="page active">
+    <h1>Flashcard Generator</h1>
+    <div class="subtitle">Paste text, upload a PDF, or pick a demo — flashcards generated by AI, translated instantly</div>
+
+    <div class="src-grid">
+      <div class="src-card active" onclick="setSource('paste')" id="src-paste"><div class="si">📝</div>Paste text</div>
+      <div class="src-card" onclick="setSource('pdf')"   id="src-pdf">  <div class="si">📄</div>Upload PDF</div>
+      <div class="src-card" onclick="setSource('demo')"  id="src-demo"> <div class="si">🧪</div>Demo lesson</div>
+      <div class="src-card" onclick="setSource('url')"   id="src-url">  <div class="si">🔗</div>Page URL</div>
+    </div>
+
+    <div id="input-paste"><textarea id="pasteArea" placeholder="Paste your lesson notes, textbook excerpt, or any study material here…"></textarea></div>
+    <div id="input-pdf" style="display:none">
+      <label class="file-lbl" for="pdfFile">📎 Click to upload a PDF</label>
+      <input type="file" id="pdfFile" accept=".pdf" onchange="onPDF()"/>
+      <div id="pdfStatus" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
+    </div>
+    <div id="input-demo" style="display:none">
+      <select class="sb-select" id="demoTopic" style="margin-top:8px">
+        <option value="photosynthesis">🌿 Photosynthesis</option>
+        <option value="newton">⚙️ Newton's Laws</option>
+        <option value="ww2">🌍 World War II</option>
+      </select>
+    </div>
+    <div id="input-url" style="display:none">
+      <input class="sb-input" id="urlInput" placeholder="https://en.wikipedia.org/wiki/…" style="margin-top:8px"/>
+      <div style="font-size:11px;color:var(--muted);margin-top:5px">URL content will be fetched and analysed by the server</div>
+    </div>
+
+    <button class="gen-btn" id="genBtn" onclick="generate()">⚡ Generate Flashcards</button>
+    <div class="err-box" id="errBox"></div>
+    <div class="loader" id="fcLoader"><div class="spinner"></div><div id="loaderTxt">Generating flashcards…</div></div>
+
+    <div id="studySet" style="display:none">
+      <div class="summary" id="summaryBox"></div>
+      <div class="inner-tabs">
+        <button class="itab active" onclick="setInner('cards')">Flashcards</button>
+        <button class="itab"        onclick="setInner('quiz')">Quiz</button>
+      </div>
+
+      <div id="inner-cards">
+        <div class="fc-ctr" id="fcCtr">Card 1 of 3</div>
+        <div class="fc-tap">Tap card to flip</div>
+        <div class="fc-wrap" onclick="flip()">
+          <div class="fc-inner" id="fcInner">
+            <div class="fc-face fc-front"><div class="fc-lbl">Question</div><div class="fc-txt" id="fcF">—</div></div>
+            <div class="fc-face fc-back"> <div class="fc-lbl">Answer</div>  <div class="fc-txt" id="fcB">—</div><div class="fc-hint" id="fcH"></div></div>
+          </div>
+        </div>
+        <div class="fc-nav">
+          <button class="fcbtn"     onclick="fcNav(-1)">← Prev</button>
+          <button class="fcbtn got" onclick="fcGot()">✅ Got it!</button>
+          <button class="fcbtn"     onclick="fcNav(1)">Next →</button>
+        </div>
+      </div>
+
+      <div id="inner-quiz" style="display:none">
+        <div class="mcq-ctr" id="mcqCtr">Question 1 of 2</div>
+        <div class="mcq-q"   id="mcqQ">—</div>
+        <div id="mcqOpts"></div>
+        <div class="mcq-exp"  id="mcqExp"></div>
+        <button class="mcq-next" id="mcqNext" onclick="nextQ()">Next question →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD PAGE -->
+  <div id="page-dashboard" class="page">
+    <h1>Session Dashboard</h1>
+    <div class="subtitle">Stats synced from your Chrome extension · click Sync in the popup</div>
+
+    <div id="dashEmpty" class="empty">
+      <div class="e-icon">📊</div>
+      <div class="e-title">No session data yet</div>
+      <div class="e-sub">Start a session in the Chrome extension<br>then click <strong style="color:var(--accent)">Sync session to app</strong></div>
+    </div>
+
+    <div id="dashContent" style="display:none">
+      <div class="metrics">
+        <div class="metric"><div class="m-val" id="d-time">—</div>   <div class="m-lbl">Study time</div></div>
+        <div class="metric"><div class="m-val" id="d-spikes">0</div> <div class="m-lbl">Conf. spikes</div></div>
+        <div class="metric"><div class="m-val" id="d-focus">100%</div><div class="m-lbl">Focus score</div></div>
+        <div class="metric"><div class="m-val" id="d-cards">0</div>  <div class="m-lbl">Cards done</div></div>
+      </div>
+      <div class="dash-grid">
+        <div class="dash-card">
+          <div class="dash-ttl">Confusion log</div>
+          <div id="spikeLog"></div>
+          <div class="dash-ttl" style="margin-top:16px">Score over time</div>
+          <svg class="chart-svg" id="confChart" height="70"></svg>
+        </div>
+        <div class="dash-card">
+          <div class="dash-ttl">Focus score</div>
+          <div class="focus-bg"><div class="focus-fill" id="focusFill" style="width:100%;background:var(--green)"></div></div>
+          <div style="font-size:12px;color:var(--muted)"><span id="focusVal">100</span>/100 · each spike −5 pts</div>
+          <div class="dash-ttl" style="margin-top:20px">Pomodoros</div>
+          <div class="pomo-row" id="pomoToms">—</div>
+          <div style="font-size:12px;color:var(--muted)"><span id="pomoCount">0</span> sessions completed</div>
+          <div class="dash-ttl" style="margin-top:20px">Cards completed</div>
+          <div class="big-num" id="totalCards">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:8000';
+const RTL  = ['Urdu','Arabic'];
+
+let flashcards=[], questions=[], fcIdx=0, mcqIdx=0, mcqDone=false, cardsDone=0, pdfText='', source='paste', studySetData=null;
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const lang = localStorage.getItem('sb_lang');
+  if (lang) document.getElementById('langSelect').value = lang;
+  pollSession();
+  setInterval(pollSession, 3000);
+});
+
+async function pollSession() {
+  try {
+    const res = await fetch(`${API}/session`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data && data.startTime) renderDash(data);
+  } catch(e) {}
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function showPage(name) {
+  document.querySelectorAll('.nav-item').forEach((b,i) => b.classList.toggle('active', ['flashcards','dashboard'][i]===name));
+  document.getElementById('page-flashcards').classList.toggle('active', name==='flashcards');
+  document.getElementById('page-dashboard').classList.toggle('active',  name==='dashboard');
+}
+
+// ── Source ────────────────────────────────────────────────────────────────────
+function setSource(s) {
+  source = s;
+  ['paste','pdf','demo','url'].forEach(x => {
+    document.getElementById(`src-${x}`).classList.toggle('active', x===s);
+    document.getElementById(`input-${x}`).style.display = x===s ? 'block' : 'none';
+  });
+}
+
+function onPDF() {
+  const file = document.getElementById('pdfFile').files[0];
+  if (!file) return;
+  document.getElementById('pdfStatus').textContent = `Loaded: ${file.name}`;
+  const reader = new FileReader();
+  reader.onload = e => { pdfText = e.target.result || `[PDF: ${file.name}]`; };
+  reader.readAsText(file);
+}
+
+function getText() {
+  if (source==='paste') return document.getElementById('pasteArea').value.trim();
+  if (source==='pdf')   return pdfText;
+  if (source==='url')   return `Fetch and summarize this URL: ${document.getElementById('urlInput').value}`;
+  const demos = {
+    photosynthesis:`Photosynthesis converts light energy into glucose: 6CO₂+6H₂O+light→C₆H₁₂O₆+6O₂. Two stages: light-dependent reactions (thylakoid membrane — splits water via photolysis, produces ATP+NADPH, releases O₂) and Calvin Cycle (stroma — RuBisCO fixes CO₂). Factors: light intensity, CO₂ concentration, temperature, water. Chlorophyll absorbs red and blue wavelengths.`,
+    newton:`Newton's Laws: 1st (Inertia) — object stays at rest/motion unless net force acts. 2nd — F=ma, force=mass×acceleration. 3rd — every action has equal opposite reaction. Momentum=mv. Impulse=F×t. Applications: rockets, seatbelts, friction, swimming.`,
+    ww2:`WWII (1939-1945): Germany invaded Poland 1939 → Allied powers formed. Japan attacked Pearl Harbor 1941 → US joined. D-Day Normandy landings June 1944. Holocaust: genocide of 6 million Jews. Atomic bombs on Hiroshima+Nagasaki August 1945. Germany surrendered May 1945, Japan September 1945. Led to UN formation and Cold War.`
+  };
+  return demos[document.getElementById('demoTopic').value] || demos.photosynthesis;
+}
+
+// ── Generate ──────────────────────────────────────────────────────────────────
+async function generate() {
+  const text = getText();
+  const lang = document.getElementById('langSelect').value;
+  if (!text) { showToast('⚠️ Add some content first'); return; }
+
+  setLoading(true, 'Generating flashcards…');
+  hideErr();
+
+  try {
+    const res = await fetch(`${API}/generate`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text, language: lang, confusion_score: 0.3 })
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || `Server error ${res.status}`);
+    }
+    const data = await res.json();
+    studySetData = data;
+    renderSet(data, lang);
+  } catch(e) {
+    showErr(e.message);
+  } finally {
+    setLoading(false);
+  }
+}
+
+// ── Language change ───────────────────────────────────────────────────────────
+function onLangChange() {
+  const lang = document.getElementById('langSelect').value;
+  localStorage.setItem('sb_lang', lang);
+  if (studySetData) translateSet(lang);
+}
+
+async function translateSet(lang) {
+  if (!studySetData) return;
+  setLoading(true, `Translating to ${lang}…`);
+  try {
+    const res = await fetch(`${API}/translate`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ study_set: studySetData, language: lang })
+    });
+    const data = await res.json();
+    renderSet(data, lang);
+    studySetData = data;
+  } catch(e) {
+    showToast('Translation failed');
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function detectLang() {
+  const text = getText();
+  if (!text) { showToast('Add text first'); return; }
+  const btn = document.querySelector('.detect-btn');
+  btn.textContent = '⏳'; btn.disabled = true;
+  try {
+    const res = await fetch(`${API}/detect-lang`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ text: text.slice(0,300) })
+    });
+    const data = await res.json();
+    const detected = data.language;
+    const opts = Array.from(document.getElementById('langSelect').options);
+    const match = opts.find(o => o.value.toLowerCase()===detected.toLowerCase());
+    if (match) { document.getElementById('langSelect').value = match.value; showToast(`Detected: ${match.value}`); }
+    else showToast(`Detected: ${detected}`);
+  } catch(e) { showToast('Detection failed'); }
+  finally { btn.textContent = '🔍 Auto-detect language'; btn.disabled = false; }
+}
+
+// ── Render set ────────────────────────────────────────────────────────────────
+function renderSet(data, lang) {
+  flashcards = data.flashcards || [];
+  questions  = data.questions  || [];
+  fcIdx = 0; mcqIdx = 0; cardsDone = 0;
+
+  const isRTL = RTL.includes(lang);
+  if (data.summary) {
+    document.getElementById('summaryBox').textContent = data.summary;
+    document.getElementById('summaryBox').className = `summary on${isRTL?' rtl':''}`;
+  }
+  document.getElementById('studySet').style.display = 'block';
+  renderCard(isRTL);
+  renderMCQ(isRTL);
+}
+
+// ── Flashcard ─────────────────────────────────────────────────────────────────
+function renderCard(isRTL = RTL.includes(document.getElementById('langSelect').value)) {
+  if (!flashcards.length) return;
+  const c = flashcards[fcIdx];
+  document.getElementById('fcF').textContent   = c.front;
+  document.getElementById('fcB').textContent   = c.back;
+  document.getElementById('fcH').textContent   = c.hint ? `💡 ${c.hint}` : '';
+  document.getElementById('fcCtr').textContent = `Card ${fcIdx+1} of ${flashcards.length}`;
+  document.getElementById('fcInner').classList.remove('flipped');
+  ['fcF','fcB'].forEach(id => document.getElementById(id).classList.toggle('rtl', isRTL));
+}
+
+function flip() { document.getElementById('fcInner').classList.toggle('flipped'); }
+function fcNav(d) { fcIdx = Math.max(0, Math.min(flashcards.length-1, fcIdx+d)); renderCard(); }
+function fcGot() {
+  cardsDone++;
+  document.getElementById('sb-cards').textContent = cardsDone;
+  showToast('Card remembered! 🎉');
+  if (fcIdx < flashcards.length-1) { fcIdx++; renderCard(); }
+}
+
+// ── MCQ ───────────────────────────────────────────────────────────────────────
+function renderMCQ(isRTL = RTL.includes(document.getElementById('langSelect').value)) {
+  if (!questions.length) return;
+  const q = questions[mcqIdx];
+  mcqDone = false;
+  document.getElementById('mcqCtr').textContent = `Question ${mcqIdx+1} of ${questions.length}`;
+  const qEl = document.getElementById('mcqQ');
+  qEl.textContent = q.question;
+  qEl.classList.toggle('rtl', isRTL);
+  document.getElementById('mcqExp').className  = 'mcq-exp';
+  document.getElementById('mcqNext').className = 'mcq-next';
+  document.getElementById('mcqOpts').innerHTML = q.options.map((o,i) =>
+    `<div class="mcq-opt${isRTL?' rtl':''}" onclick="answer(${i})" data-i="${i}"><span class="mcq-ltr">${'ABCD'[i]}</span><span>${o}</span></div>`
+  ).join('');
+}
+
+function answer(chosen) {
+  if (mcqDone) return;
+  mcqDone = true;
+  const q = questions[mcqIdx];
+  document.querySelectorAll('#mcqOpts .mcq-opt').forEach((el,i) => {
+    if (i===q.correct_index) el.classList.add('correct');
+    else if (i===chosen)     el.classList.add('wrong');
+  });
+  document.getElementById('mcqExp').textContent = q.explanation;
+  document.getElementById('mcqExp').className = 'mcq-exp on';
+  if (mcqIdx < questions.length-1) document.getElementById('mcqNext').className = 'mcq-next on';
+}
+
+function nextQ() { mcqIdx++; renderMCQ(); }
+
+function setInner(tab) {
+  document.querySelectorAll('.itab').forEach((b,i) => b.classList.toggle('active', ['cards','quiz'][i]===tab));
+  document.getElementById('inner-cards').style.display = tab==='cards' ? 'block' : 'none';
+  document.getElementById('inner-quiz').style.display  = tab==='quiz'  ? 'block' : 'none';
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+function renderDash(s) {
+  document.getElementById('dashEmpty').style.display   = 'none';
+  document.getElementById('dashContent').style.display = 'block';
+
+  if (s.startTime) {
+    const e = Math.floor((Date.now()-s.startTime)/1000);
+    document.getElementById('d-time').textContent = `${Math.floor(e/60)}m${e%60}s`;
+  }
+  document.getElementById('d-spikes').textContent = s.confusionSpikes||0;
+  document.getElementById('d-focus').textContent  = `${s.focusScore||100}%`;
+  document.getElementById('d-cards').textContent  = (s.cardsDone||0)+cardsDone;
+  document.getElementById('sb-spikes').textContent= s.confusionSpikes||0;
+
+  const f = s.focusScore||100;
+  document.getElementById('focusVal').textContent = f;
+  document.getElementById('focusFill').style.width = `${f}%`;
+  document.getElementById('focusFill').style.background = f>70?'var(--green)':f>40?'var(--orange)':'var(--red)';
+
+  const p = s.pomodorosDone||0;
+  document.getElementById('pomoCount').textContent = p;
+  document.getElementById('pomoToms').textContent  = p>0 ? '🍅'.repeat(Math.min(p,10)) : '—';
+  document.getElementById('totalCards').textContent= (s.cardsDone||0)+cardsDone;
+
+  const log = s.confusionLog||[];
+  document.getElementById('spikeLog').innerHTML = log.slice(-8).reverse().map(e => {
+    const t = new Date(e.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    const c = e.score<0.35?'var(--green)':e.score<0.65?'var(--orange)':'var(--red)';
+    return `<div class="spike-row"><div class="s-dot" style="background:${c}"></div><span class="s-time">${t}</span><span>${e.score.toFixed(2)}</span></div>`;
+  }).join('') || '<div style="font-size:12px;color:var(--muted)">No spikes yet</div>';
+
+  if (log.length>1) drawChart(log);
+}
+
+function drawChart(log) {
+  const svg = document.getElementById('confChart');
+  const W = svg.parentElement.clientWidth||300, H=65;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const scores = log.map(e=>e.score);
+  const pts = scores.map((s,i)=>{
+    const x=(i/(scores.length-1))*(W-20)+10;
+    const y=H-8-s*(H-18);
+    return `${x},${y}`;
+  }).join(' ');
+  svg.innerHTML=`<polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>
+  ${scores.map((s,i)=>{const x=(i/(scores.length-1))*(W-20)+10,y=H-8-s*(H-18),c=s<0.35?'var(--green)':s<0.65?'var(--orange)':'var(--red)';return`<circle cx="${x}" cy="${y}" r="3" fill="${c}"/>`;}).join('')}`;
+}
+
+// ── Utils ─────────────────────────────────────────────────────────────────────
+function setLoading(on, txt='') {
+  document.getElementById('fcLoader').classList.toggle('on', on);
+  document.getElementById('genBtn').disabled = on;
+  if (txt) document.getElementById('loaderTxt').textContent = txt;
+  if (on) document.getElementById('studySet').style.display = 'none';
+}
+
+function showErr(msg) {
+  const el = document.getElementById('errBox');
+  el.textContent = `⚠️ ${msg}`;
+  el.classList.add('on');
+}
+function hideErr() { document.getElementById('errBox').classList.remove('on'); }
+
+let toastT;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT);
+  toastT = setTimeout(()=>t.classList.remove('on'), 3000);
+}
+</script>
+</body>
+</html>
