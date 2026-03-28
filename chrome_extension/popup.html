@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StudyBuddy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --clockwork: #721B06;
+      --cedar: #7C7948;
+      --latte: #B8B143;
+      --deep-olive: #444210;
+      --cafe-noir: #443222;
+      --mauve: #755151;
+      --weathered: #888676;
+      --linen: #F7F5F3;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 320px;
+      min-height: 420px;
+      background: var(--linen);
+      font-family: 'DM Sans', sans-serif;
+      color: var(--cafe-noir);
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1.5px solid rgba(114, 27, 6, 0.15);
+    }
+
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      color: var(--clockwork);
+      letter-spacing: 0.02em;
+    }
+
+    .header p {
+      font-size: 11px;
+      color: var(--weathered);
+      margin-top: 3px;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: white;
+      border: 1px solid rgba(114,27,6,0.2);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 11px;
+      color: var(--weathered);
+      margin-bottom: 16px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--weathered);
+      transition: background 0.3s;
+    }
+    .status-dot.active { background: #4caf50; }
+
+    .btn {
+      width: 100%;
+      padding: 11px 16px;
+      border-radius: 10px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 8px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      background: var(--clockwork);
+      color: var(--linen);
+    }
+    .btn-primary:hover { background: #5a1504; transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: white;
+      color: var(--cafe-noir);
+      border: 1.5px solid rgba(114,27,6,0.2);
+    }
+    .btn-secondary:hover { border-color: var(--clockwork); transform: translateY(-1px); }
+
+    .btn-olive {
+      background: var(--deep-olive);
+      color: var(--linen);
+    }
+    .btn-olive:hover { background: #333108; transform: translateY(-1px); }
+
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; }
+
+    .output-box {
+      background: white;
+      border: 1.5px solid rgba(114,27,6,0.12);
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--cafe-noir);
+      min-height: 80px;
+      max-height: 180px;
+      overflow-y: auto;
+      margin-top: 12px;
+      display: none;
+    }
+
+    .output-box.visible { display: block; }
+
+    .flashcard {
+      background: white;
+      border: 1.5px solid rgba(114,27,6,0.15);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 6px;
+      font-size: 11.5px;
+    }
+
+    .flashcard strong {
+      display: block;
+      color: var(--clockwork);
+      margin-bottom: 4px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .loader {
+      display: none;
+      text-align: center;
+      padding: 8px;
+      font-size: 11px;
+      color: var(--weathered);
+    }
+    .loader.visible { display: block; }
+
+    .divider {
+      height: 1px;
+      background: rgba(114,27,6,0.1);
+      margin: 12px 0;
+    }
+
+    .section-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--weathered);
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>StudyBuddy 📖</h1>
+    <p>AI-powered study companion</p>
+  </div>
+
+  <div style="text-align:center">
+    <div class="status-pill">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">Ready</span>
+    </div>
+  </div>
+
+  <div class="section-label">Actions</div>
+
+  <button class="btn btn-primary" id="explainBtn">
+    🔍 Explain This Page
+  </button>
+
+  <button class="btn btn-olive" id="flashcardBtn">
+    🃏 Generate Flashcards
+  </button>
+
+  <button class="btn btn-secondary" id="extractBtn">
+    📋 Preview Page Content
+  </button>
+
+  <div class="loader" id="loader">Thinking... ✨</div>
+
+  <div class="output-box" id="outputBox"></div>
+
+</body>
+<script src="popup.js"></script>
+</html>
