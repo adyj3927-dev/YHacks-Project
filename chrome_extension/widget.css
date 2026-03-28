@@ -1,0 +1,106 @@
+/* widget.css — floating StudyBuddy widget injected on every page */
+
+#sb-widget {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 2147483647;
+  background: #1e1e2e;
+  border: 1px solid #313244;
+  border-radius: 12px;
+  min-width: 180px;
+  max-width: 200px;
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  font-size: 12px;
+  color: #cdd6f4;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transition: box-shadow 0.3s ease;
+  user-select: none;
+}
+
+#sb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid #313244;
+  cursor: grab;
+  border-radius: 12px 12px 0 0;
+}
+#sb-header:active { cursor: grabbing; }
+
+#sb-logo {
+  font-size: 11px;
+  font-weight: 600;
+  color: #cba6f7;
+}
+
+#sb-toggle {
+  background: none;
+  border: none;
+  color: #6c7086;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+}
+#sb-toggle:hover { color: #cdd6f4; }
+
+#sb-body { padding: 10px; }
+
+#sb-timer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+#sb-timer {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #cba6f7;
+  font-variant-numeric: tabular-nums;
+}
+
+#sb-conf-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #a6e3a1;
+  transition: background 0.4s ease;
+  flex-shrink: 0;
+}
+
+#sb-bar-bg {
+  background: #313244;
+  border-radius: 4px;
+  height: 4px;
+  margin-bottom: 6px;
+}
+
+#sb-bar-fill {
+  border-radius: 4px;
+  height: 4px;
+  width: 0%;
+  background: #a6e3a1;
+  transition: width 0.4s ease, background 0.4s ease;
+}
+
+#sb-status {
+  font-size: 10px;
+  color: #6c7086;
+  margin-bottom: 2px;
+}
+
+#sb-spike-msg {
+  margin-top: 6px;
+  background: #f38ba820;
+  border: 1px solid #f38ba840;
+  border-radius: 6px;
+  padding: 5px 7px;
+  font-size: 10px;
+  color: #f38ba8;
+  line-height: 1.4;
+  cursor: pointer;
+}
