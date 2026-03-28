@@ -1,560 +1,1349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>StudyBuddy</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&family=Noto+Sans+Arabic&family=Noto+Sans+Devanagari&display=swap" rel="stylesheet"/>
-<style>
-:root {
-  --bg:#0d0d12; --surface:#13131a; --surface2:#1a1a24;
-  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
-  --text:#e8e6f0; --muted:#7a7890; --accent:#c9a96e; --accent2:#e8c99a;
-  --green:#6fcf97; --orange:#f2994a; --red:#eb5757; --purple:#bb9af7;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans','Noto Sans Arabic','Noto Sans Devanagari',sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");opacity:0.4;}
-.shell{display:flex;min-height:100vh;position:relative;z-index:1;}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>StudyBuddy — Notebook Edition</title>
 
-/* Sidebar */
-.sidebar{width:230px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:26px 18px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;overflow-y:auto;}
-.logo{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--accent);letter-spacing:.04em;margin-bottom:18px;display:flex;align-items:center;gap:8px;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13px;color:var(--muted);cursor:pointer;transition:all .18s;border:none;background:none;width:100%;text-align:left;}
-.nav-item:hover{background:var(--surface2);color:var(--text);}
-.nav-item.active{background:rgba(201,169,110,.12);color:var(--accent);}
-.nav-item .icon{font-size:15px;width:18px;}
-.sb-section{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:14px 0 6px 12px;}
-.sb-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px;font-family:'DM Sans',sans-serif;width:100%;outline:none;transition:border .18s;}
-.sb-input:focus{border-color:var(--accent);}
-.sb-select{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:12px;width:100%;outline:none;cursor:pointer;font-family:'DM Sans',sans-serif;}
-.detect-btn{width:100%;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:11px;cursor:pointer;margin-top:5px;transition:all .18s;font-family:'DM Sans',sans-serif;}
-.detect-btn:hover{border-color:var(--accent);color:var(--accent);}
-.sb-stats{font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;margin-top:auto;}
-.sb-stats span{color:var(--text);}
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
 
-/* Main */
-.main{flex:1;padding:36px 40px;max-width:900px;}
-h1{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;color:var(--text);margin-bottom:4px;letter-spacing:.01em;}
-.subtitle{font-size:13px;color:var(--muted);margin-bottom:26px;}
-.page{display:none;} .page.active{display:block;}
-
-/* Source grid */
-.src-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;}
-.src-card{padding:12px 8px;border-radius:10px;border:1px solid var(--border);background:var(--surface);cursor:pointer;text-align:center;transition:all .18s;font-size:12px;color:var(--muted);}
-.src-card:hover{border-color:var(--border2);color:var(--text);}
-.src-card.active{border-color:var(--accent);color:var(--accent);background:rgba(201,169,110,.06);}
-.src-card .si{font-size:20px;margin-bottom:5px;}
-
-textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:120px;outline:none;transition:border .18s;line-height:1.6;}
-textarea:focus{border-color:var(--accent);}
-
-.gen-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border-radius:10px;border:none;background:linear-gradient(135deg,#c9a96e,#e8c99a);color:#0d0d12;font-size:14px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:12px;transition:all .2s;letter-spacing:.02em;}
-.gen-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(201,169,110,.25);}
-.gen-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;}
-
-/* Loader */
-.loader{display:none;text-align:center;padding:40px;color:var(--muted);font-size:13px;}
-.loader.on{display:block;}
-.spinner{width:30px;height:30px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-/* Study set */
-.summary{background:rgba(201,169,110,.06);border:1px solid rgba(201,169,110,.2);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.7;color:var(--muted);margin-bottom:18px;font-style:italic;display:none;}
-.summary.on{display:block;}
-.inner-tabs{display:flex;gap:6px;margin-bottom:14px;}
-.itab{padding:6px 16px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
-.itab:hover{border-color:var(--border2);color:var(--text);}
-.itab.active{background:var(--accent);color:#0d0d12;border-color:var(--accent);font-weight:500;}
-
-/* Flashcard */
-.fc-wrap{perspective:1000px;height:160px;cursor:pointer;margin-bottom:10px;}
-.fc-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,0,.2,1);}
-.fc-inner.flipped{transform:rotateY(180deg);}
-.fc-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:14px;padding:20px 24px;display:flex;flex-direction:column;justify-content:center;}
-.fc-front{background:var(--surface2);border:1px solid var(--border);}
-.fc-back{background:linear-gradient(135deg,#1a1408,#2a2010);border:1px solid rgba(201,169,110,.25);transform:rotateY(180deg);}
-.fc-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px;}
-.fc-txt{font-size:15px;line-height:1.5;color:var(--text);}
-.fc-hint{font-size:12px;color:var(--accent);margin-top:10px;font-style:italic;}
-.fc-tap{font-size:11px;color:var(--muted);text-align:center;margin-bottom:7px;}
-.fc-ctr{font-size:11px;color:var(--muted);text-align:right;margin-bottom:6px;}
-.fc-nav{display:flex;gap:8px;}
-.fcbtn{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;text-align:center;}
-.fcbtn:hover{border-color:var(--border2);color:var(--text);}
-.fcbtn.got{background:rgba(111,207,151,.1);color:var(--green);border-color:rgba(111,207,151,.3);}
-
-/* MCQ */
-.mcq-q{font-size:14px;color:var(--text);margin-bottom:12px;line-height:1.5;}
-.mcq-ctr{font-size:11px;color:var(--muted);margin-bottom:10px;}
-.mcq-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface2);font-size:13px;cursor:pointer;margin-bottom:6px;transition:all .15s;line-height:1.5;}
-.mcq-opt:hover{border-color:var(--border2);}
-.mcq-opt.correct{background:rgba(111,207,151,.08);border-color:rgba(111,207,151,.3);color:var(--green);}
-.mcq-opt.wrong{background:rgba(235,87,87,.08);border-color:rgba(235,87,87,.3);color:var(--red);}
-.mcq-ltr{font-weight:500;color:var(--accent);min-width:16px;}
-.mcq-exp{margin-top:10px;padding:10px 14px;background:var(--surface2);border-radius:8px;border:1px solid var(--border);font-size:12px;color:var(--muted);line-height:1.6;display:none;}
-.mcq-exp.on{display:block;}
-.mcq-next{width:100%;margin-top:10px;padding:9px;border-radius:8px;background:rgba(201,169,110,.1);border:1px solid rgba(201,169,110,.25);color:var(--accent);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;display:none;transition:all .15s;}
-.mcq-next:hover{background:rgba(201,169,110,.18);}
-.mcq-next.on{display:block;}
-
-/* Dashboard */
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px;}
-.metric{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 14px;text-align:center;}
-.m-val{font-family:'Cormorant Garamond',serif;font-size:30px;color:var(--accent);font-weight:600;}
-.m-lbl{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em;}
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-.dash-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;}
-.dash-ttl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;}
-.spike-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);}
-.s-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.s-time{color:var(--text);min-width:56px;}
-.focus-bg{background:var(--surface2);border-radius:6px;height:10px;margin:8px 0;}
-.focus-fill{border-radius:6px;height:10px;transition:width .6s;}
-.pomo-row{font-size:22px;letter-spacing:3px;margin:8px 0;}
-.big-num{font-family:'Cormorant Garamond',serif;font-size:36px;color:var(--purple);}
-
-.empty{text-align:center;padding:60px 20px;color:var(--muted);}
-.e-icon{font-size:48px;margin-bottom:14px;opacity:.5;}
-.e-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--text);margin-bottom:8px;}
-.e-sub{font-size:13px;line-height:1.6;}
-
-.chart-svg{width:100%;overflow:visible;}
-
-/* Error */
-.err-box{background:rgba(235,87,87,.08);border:1px solid rgba(235,87,87,.25);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--red);margin-top:10px;display:none;}
-.err-box.on{display:block;}
-
-/* Toast */
-.toast{position:fixed;bottom:24px;right:24px;z-index:1000;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;color:var(--text);transform:translateY(80px);opacity:0;transition:all .3s;max-width:260px;}
-.toast.on{transform:translateY(0);opacity:1;}
-
-/* RTL */
-.rtl{direction:rtl;text-align:right;}
-
-input[type=file]{display:none;}
-.file-lbl{display:block;padding:10px;border-radius:8px;border:1px dashed var(--border2);color:var(--muted);font-size:12px;text-align:center;cursor:pointer;transition:all .15s;margin-top:8px;}
-.file-lbl:hover{border-color:var(--accent);color:var(--accent);}
-</style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="shell">
+  <div class="parallax layer layer-back" data-speed="-0.18"></div>
+  <div class="parallax layer layer-mid" data-speed="-0.08"></div>
+  <div class="parallax layer layer-front" data-speed="0.12"></div>
 
-<!-- Sidebar -->
-<aside class="sidebar">
-  <div class="logo">📖 StudyBuddy</div>
-  <button class="nav-item active" onclick="showPage('flashcards')"><span class="icon">🎴</span>Flashcards</button>
-  <button class="nav-item" onclick="showPage('dashboard')"><span class="icon">📊</span>Dashboard</button>
-
-  <div class="sb-section">Language</div>
-  <select class="sb-select" id="langSelect" onchange="onLangChange()">
-    <option value="English">🇺🇸 English</option>
-    <option value="Hindi">🇮🇳 Hindi — हिन्दी</option>
-    <option value="Urdu">🇵🇰 Urdu — اردو</option>
-    <option value="Arabic">🇸🇦 Arabic — العربية</option>
-    <option value="French">🇫🇷 French</option>
-    <option value="Spanish">🇪🇸 Spanish</option>
-    <option value="Mandarin">🇨🇳 Mandarin</option>
-  </select>
-  <button class="detect-btn" onclick="detectLang()">🔍 Auto-detect language</button>
-
-  <div class="sb-section" style="margin-top:auto">Session</div>
-  <div class="sb-stats">
-    Cards done: <span id="sb-cards">0</span><br>
-    Spikes: <span id="sb-spikes">0</span>
+  <div class="scroll-hint" id="scroll-hint">
+    <span class="arrow">⬅︎</span> Scroll to explore
   </div>
-</aside>
 
-<!-- Main -->
-<main class="main">
+  <div class="horizontal-viewport">
+    <div class="scroll-track" id="scroll-track">
+      <!-- Panel 1 -->
+      <section class="panel hero">
+        <div class="panel-scroll">
+          <span class="stamp">Notebook Edition</span>
+          <h1>StudyBuddy</h1>
+          <p class="subtitle">Your AI study companion, stretched across one long horizontal notebook page.</p>
 
-  <!-- FLASHCARDS PAGE -->
-  <div id="page-flashcards" class="page active">
-    <h1>Flashcard Generator</h1>
-    <div class="subtitle">Paste text, upload a PDF, or pick a demo — flashcards generated by AI, translated instantly</div>
+          <div class="status-line">
+            <span id="status-text">● Screen reading inactive — load something to begin</span>
+          </div>
 
-    <div class="src-grid">
-      <div class="src-card active" onclick="setSource('paste')" id="src-paste"><div class="si">📝</div>Paste text</div>
-      <div class="src-card" onclick="setSource('pdf')"   id="src-pdf">  <div class="si">📄</div>Upload PDF</div>
-      <div class="src-card" onclick="setSource('demo')"  id="src-demo"> <div class="si">🧪</div>Demo lesson</div>
-      <div class="src-card" onclick="setSource('url')"   id="src-url">  <div class="si">🔗</div>Page URL</div>
-    </div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div id="stat-time" class="stat-value">00:00</div>
+              <div class="stat-label">time studied</div>
+            </div>
+            <div class="stat-card">
+              <div id="stat-cards" class="stat-value">0</div>
+              <div class="stat-label">cards mastered</div>
+            </div>
+            <div class="stat-card">
+              <div id="stat-spikes" class="stat-value">0</div>
+              <div class="stat-label">confusion spikes</div>
+            </div>
+            <div class="stat-card">
+              <div id="stat-focus" class="stat-value">0</div>
+              <div class="stat-label">focus alerts</div>
+            </div>
+          </div>
 
-    <div id="input-paste"><textarea id="pasteArea" placeholder="Paste your lesson notes, textbook excerpt, or any study material here…"></textarea></div>
-    <div id="input-pdf" style="display:none">
-      <label class="file-lbl" for="pdfFile">📎 Click to upload a PDF</label>
-      <input type="file" id="pdfFile" accept=".pdf" onchange="onPDF()"/>
-      <div id="pdfStatus" style="font-size:12px;color:var(--muted);margin-top:6px"></div>
-    </div>
-    <div id="input-demo" style="display:none">
-      <select class="sb-select" id="demoTopic" style="margin-top:8px">
-        <option value="photosynthesis">🌿 Photosynthesis</option>
-        <option value="newton">⚙️ Newton's Laws</option>
-        <option value="ww2">🌍 World War II</option>
-      </select>
-    </div>
-    <div id="input-url" style="display:none">
-      <input class="sb-input" id="urlInput" placeholder="https://en.wikipedia.org/wiki/…" style="margin-top:8px"/>
-      <div style="font-size:11px;color:var(--muted);margin-top:5px">URL content will be fetched and analysed by the server</div>
-    </div>
-
-    <button class="gen-btn" id="genBtn" onclick="generate()">⚡ Generate Flashcards</button>
-    <div class="err-box" id="errBox"></div>
-    <div class="loader" id="fcLoader"><div class="spinner"></div><div id="loaderTxt">Generating flashcards…</div></div>
-
-    <div id="studySet" style="display:none">
-      <div class="summary" id="summaryBox"></div>
-      <div class="inner-tabs">
-        <button class="itab active" onclick="setInner('cards')">Flashcards</button>
-        <button class="itab"        onclick="setInner('quiz')">Quiz</button>
-      </div>
-
-      <div id="inner-cards">
-        <div class="fc-ctr" id="fcCtr">Card 1 of 3</div>
-        <div class="fc-tap">Tap card to flip</div>
-        <div class="fc-wrap" onclick="flip()">
-          <div class="fc-inner" id="fcInner">
-            <div class="fc-face fc-front"><div class="fc-lbl">Question</div><div class="fc-txt" id="fcF">—</div></div>
-            <div class="fc-face fc-back"> <div class="fc-lbl">Answer</div>  <div class="fc-txt" id="fcB">—</div><div class="fc-hint" id="fcH"></div></div>
+          <div class="button-row">
+            <button id="simulate-confusion-btn" class="accent-btn">⚡ Simulate confusion spike</button>
+            <button id="simulate-focus-btn" class="danger-btn">👁 Simulate focus lost</button>
           </div>
         </div>
-        <div class="fc-nav">
-          <button class="fcbtn"     onclick="fcNav(-1)">← Prev</button>
-          <button class="fcbtn got" onclick="fcGot()">✅ Got it!</button>
-          <button class="fcbtn"     onclick="fcNav(1)">Next →</button>
-        </div>
-      </div>
+      </section>
 
-      <div id="inner-quiz" style="display:none">
-        <div class="mcq-ctr" id="mcqCtr">Question 1 of 2</div>
-        <div class="mcq-q"   id="mcqQ">—</div>
-        <div id="mcqOpts"></div>
-        <div class="mcq-exp"  id="mcqExp"></div>
-        <button class="mcq-next" id="mcqNext" onclick="nextQ()">Next question →</button>
-      </div>
+      <!-- Panel 2 -->
+      <section class="panel setup">
+        <div class="panel-scroll">
+          <h2>Set up your study session</h2>
+          <div class="setup-grid">
+            <article class="card">
+              <h3>Gemini API key (optional)</h3>
+              <label for="api-key">Store it here so you remember it later</label>
+              <input type="password" id="api-key" placeholder="sk-..." />
+              <small>You don’t need an API key for this demo. The Streamlit version uses it to make AI flashcards.</small>
+            </article>
+
+            <article class="card">
+              <h3>Manual content (fallback)</h3>
+              <small>Pick a demo lesson or paste your own text. Screen OCR isn’t available in this static build.</small>
+
+              <div class="radio-group">
+                <label><input type="radio" name="manual-mode" value="demo" checked /> Demo lesson</label>
+                <label><input type="radio" name="manual-mode" value="paste" /> Paste text</label>
+                <label><input type="radio" name="manual-mode" value="upload" /> Upload PDF (coming soon)</label>
+              </div>
+
+              <div id="manual-demo-panel">
+                <label for="demo-topic">Topic</label>
+                <select id="demo-topic">
+                  <option value="photosynthesis">Photosynthesis (Biology)</option>
+                  <option value="newton_laws">Newton’s Laws (Physics)</option>
+                </select>
+                <button id="load-demo-btn" class="accent-btn demo-btn">Load demo lesson</button>
+              </div>
+
+              <div id="manual-paste-panel" class="hidden">
+                <label for="manual-text">Paste your study text</label>
+                <textarea id="manual-text" placeholder="Paste a paragraph or two…"></textarea>
+                <button id="use-text-btn" class="accent-btn paste-btn">Use this text</button>
+              </div>
+
+              <div id="manual-upload-panel" class="hidden">
+                <small>PDF parsing isn’t built into this notebook port yet. Stick with the demo lessons or pasted text for now!</small>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 3 -->
+      <section class="panel workspace">
+        <div class="panel-scroll">
+          <div id="focus-alert" class="focus-alert hidden">
+            <h3>⚠️ Focus check!</h3>
+            <p>You switched away from your study material. Come back — your session is still running.</p>
+            <button id="focus-dismiss-btn" class="accent-btn">I'm back — dismiss</button>
+          </div>
+
+          <div class="screen-wrap">
+            <h2>🖥 What you're studying right now</h2>
+            <div id="screen-panel" class="screen-panel">
+              <div class="panel-placeholder">
+                <div class="placeholder-emoji">👀</div>
+                <div class="placeholder-text">
+                  Waiting for content… Load a demo lesson, paste text, or generate cards with the Studio panel.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flash-attention">
+            <section class="flashcards">
+              <h2>📚 Flashcards &amp; checks</h2>
+              <div id="flashcard-section" class="flashcard-section hidden">
+                <div id="summary-box" class="summary-box hidden"></div>
+
+                <div id="flash-tabs" class="flash-tabs hidden">
+                  <button type="button" class="flash-tab active" data-tab="cards">Flashcards</button>
+                  <button type="button" class="flash-tab" data-tab="quiz">Quick quiz</button>
+                </div>
+
+                <div id="cards-pane" class="cards-pane hidden">
+                  <div class="flashcard-interactive">
+                    <div class="fc-meta">
+                      <span id="fc-counter" class="fc-counter">Card 1 of 1</span>
+                      <span id="fc-progress" class="fc-progress hidden"></span>
+                    </div>
+                    <div class="fc-instruction">Tap the card to flip it</div>
+                    <div class="fc-wrap" id="fc-wrap">
+                      <div class="fc-inner" id="fc-inner">
+                        <div class="fc-face fc-front">
+                          <span class="fc-label">Question</span>
+                          <p id="fc-front">—</p>
+                        </div>
+                        <div class="fc-face fc-back">
+                          <span class="fc-label">Answer</span>
+                          <p id="fc-back">—</p>
+                          <span class="fc-hint hidden" id="fc-hint"></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="fc-nav">
+                      <button type="button" class="secondary-btn fc-btn" id="fc-prev">← Prev</button>
+                      <button type="button" class="accent-btn fc-btn" id="fc-got">✅ Got it!</button>
+                      <button type="button" class="secondary-btn fc-btn" id="fc-next">Next →</button>
+                    </div>
+                  </div>
+
+                  <div id="flashcard-list" class="flashcard-list"></div>
+                </div>
+
+                <div id="quiz-pane" class="quiz-pane hidden">
+                  <div class="quiz-meta">
+                    <span id="mcq-counter" class="mcq-counter">Question 1 of 1</span>
+                  </div>
+                  <div id="mcq-question" class="mcq-question"></div>
+                  <div id="mcq-options" class="quiz-options"></div>
+                  <div class="feedback hidden" id="mcq-feedback"></div>
+                  <button type="button" class="secondary-btn next-btn hidden" id="mcq-next">Next question →</button>
+                </div>
+              </div>
+            </section>
+
+            <aside class="attention-card">
+              <h3>👁 Attention</h3>
+              <div id="confusion-badge" class="score-badge score-low">Confusion: low (0.12)</div>
+              <div class="conf-bar-wrap">
+                <div class="conf-label">Confusion level</div>
+                <div class="conf-bar-bg">
+                  <div id="confusion-bar" class="conf-bar-fill"></div>
+                </div>
+              </div>
+              <small class="cam-note">
+                Webcam analytics aren’t available in this static build. Use the buttons on the first panel to simulate spikes or focus loss.
+              </small>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- Panel 4 -->
+      <section class="panel pro-panel">
+        <div class="panel-scroll">
+          <header class="pro-header">
+            <h2>StudyBuddy Studio</h2>
+            <p>
+              A polished builder for advanced sessions — recolored in our notebook palette and nestled into the horizontal flow. Generate AI flashcards, translate them, or sync stats from the Chrome extension.
+            </p>
+          </header>
+
+          <div class="pro-layout">
+            <aside class="pro-sidebar">
+              <div class="pro-logo">📖 StudyBuddy</div>
+              <button class="pro-nav active" data-page="flashcards" onclick="showPage('flashcards')"><span>🎴</span>Flashcards</button>
+              <button class="pro-nav" data-page="dashboard" onclick="showPage('dashboard')"><span>📊</span>Dashboard</button>
+              <button class="pro-nav" data-page="experiments" onclick="showPage('experiments')"><span>🧪</span>Experiments</button>
+
+              <div class="pro-divider"></div>
+
+              <div class="pro-block">
+                <h4>Language</h4>
+                <select class="pro-select" id="langSelect">
+                  <option value="English">🇺🇸 English</option>
+                  <option value="Hindi">🇮🇳 Hindi — हिन्दी</option>
+                  <option value="Urdu">🇵🇰 Urdu — اردو</option>
+                  <option value="Arabic">🇸🇦 Arabic — العربية</option>
+                  <option value="French">🇫🇷 French</option>
+                  <option value="Spanish">🇪🇸 Spanish</option>
+                  <option value="Mandarin">🇨🇳 Mandarin</option>
+                </select>
+                <button class="pro-ghost" type="button" id="detect-lang-btn">🔍 Auto-detect language</button>
+              </div>
+
+              <div class="pro-block">
+                <h4>Session snapshot</h4>
+                <ul class="pro-stats">
+                  <li><span>Cards mastered</span><strong id="sb-cards">0</strong></li>
+                  <li><span>Confusion spikes</span><strong id="sb-spikes">0</strong></li>
+                  <li><span>Focus score</span><strong id="focusValSidebar">—</strong></li>
+                </ul>
+              </div>
+            </aside>
+
+            <div class="pro-main">
+              <div id="page-flashcards" class="studio-page active">
+                <div class="pro-card pro-source">
+                  <h3>Generator controls</h3>
+                  <p class="pro-helper">
+                    Paste notes, upload PDFs, try a demo, or point to a URL. StudyBuddy will create cards and quizzes in the notebook workspace.
+                  </p>
+
+                  <div class="source-grid">
+                    <div class="src-card active" id="src-paste" data-source="paste" role="button" tabindex="0">
+                      <div class="src-icon">📝</div>
+                      <div class="src-label">Paste text</div>
+                    </div>
+                    <div class="src-card" id="src-pdf" data-source="pdf" role="button" tabindex="0">
+                      <div class="src-icon">📄</div>
+                      <div class="src-label">Upload PDF</div>
+                    </div>
+                    <div class="src-card" id="src-demo" data-source="demo" role="button" tabindex="0">
+                      <div class="src-icon">🧪</div>
+                      <div class="src-label">Demo lesson</div>
+                    </div>
+                    <div class="src-card" id="src-url" data-source="url" role="button" tabindex="0">
+                      <div class="src-icon">🔗</div>
+                      <div class="src-label">Page URL</div>
+                    </div>
+                  </div>
+
+                  <div class="source-panel" id="input-paste">
+                    <textarea id="pasteArea" placeholder="Paste your lesson notes, textbook excerpt, or lecture transcript…"></textarea>
+                  </div>
+
+                  <div class="source-panel hidden" id="input-pdf">
+                    <label for="pdfFile" class="file-label">📎 Click to upload a PDF</label>
+                    <input type="file" id="pdfFile" accept=".pdf" />
+                    <div id="pdfStatus" class="file-status"></div>
+                  </div>
+
+                  <div class="source-panel hidden" id="input-demo">
+                    <label for="demoTopic" class="source-label">Choose a demo topic</label>
+                    <select id="demoTopic">
+                      <option value="photosynthesis">🌿 Photosynthesis</option>
+                      <option value="newton">⚙️ Newton's Laws</option>
+                      <option value="ww2">🌍 World War II</option>
+                    </select>
+                  </div>
+
+                  <div class="source-panel hidden" id="input-url">
+                    <label for="urlInput" class="source-label">Paste a URL</label>
+                    <input type="url" id="urlInput" placeholder="https://en.wikipedia.org/wiki/…" />
+                    <small>URL content is fetched and analysed by the StudyBuddy server.</small>
+                  </div>
+
+                  <div class="generator-actions">
+                    <button type="button" class="accent-btn wide-btn" id="genBtn">⚡ Generate flashcards</button>
+                  </div>
+
+                  <div id="errBox" class="err-box hidden"></div>
+                  <div id="fcLoader" class="pro-loader hidden">
+                    <div class="spinner"></div>
+                    <span id="loaderTxt">Generating flashcards…</span>
+                  </div>
+                </div>
+
+                <div class="pro-card pro-note">
+                  <h3>How it works</h3>
+                  <p>
+                    Generated cards and quizzes appear in the “📚 Flashcards & checks” panel of the notebook workspace. Use the language picker on the left to translate the current set instantly.
+                  </p>
+                </div>
+              </div>
+
+              <div id="page-dashboard" class="studio-page">
+                <div class="pro-card">
+                  <h3>Session dashboard</h3>
+                  <p class="pro-helper">Stats sync from the browser extension every few seconds. Click “Sync session to app” in the popup to push fresh data.</p>
+
+                  <div id="dashEmpty" class="dash-empty">
+                    <div class="empty-icon">📊</div>
+                    <div class="empty-title">No session data yet</div>
+                    <div class="empty-sub">Start a session in the Chrome extension and sync it to see live metrics here.</div>
+                  </div>
+
+                  <div id="dashContent" class="dash-content hidden">
+                    <div class="metrics-grid">
+                      <div class="metric-card">
+                        <div class="metric-value" id="d-time">—</div>
+                        <div class="metric-label">Study time</div>
+                      </div>
+                      <div class="metric-card">
+                        <div class="metric-value" id="d-spikes">0</div>
+                        <div class="metric-label">Confusion spikes</div>
+                      </div>
+                      <div class="metric-card">
+                        <div class="metric-value" id="d-focus">100%</div>
+                        <div class="metric-label">Focus score</div>
+                      </div>
+                      <div class="metric-card">
+                        <div class="metric-value" id="d-cards">0</div>
+                        <div class="metric-label">Cards done</div>
+                      </div>
+                    </div>
+
+                    <div class="dash-grid">
+                      <div class="dash-card">
+                        <h4>Confusion log</h4>
+                        <div id="spikeLog" class="spike-log"></div>
+                        <h4>Score over time</h4>
+                        <svg class="chart-svg" id="confChart" height="70"></svg>
+                      </div>
+                      <div class="dash-card">
+                        <h4>Focus score</h4>
+                        <div class="focus-bar">
+                          <div class="focus-fill" id="focusFill" style="width:100%;"></div>
+                        </div>
+                        <small class="focus-note"><span id="focusVal">100</span>/100 · each spike −5 pts</small>
+
+                        <h4>Pomodoros</h4>
+                        <div class="pomo-row" id="pomoToms">—</div>
+                        <small><span id="pomoCount">0</span> sessions completed</small>
+
+                        <h4>Cards completed</h4>
+                        <div class="big-number" id="totalCards">0</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="page-experiments" class="studio-page">
+                <div class="pro-card">
+                  <h3>Experiments</h3>
+                  <p class="pro-helper">This area is reserved for upcoming prototypes — adaptive pacing, spaced repetition timelines, and more.</p>
+                  <div class="empty-state">
+                    <div class="empty-icon">🧪</div>
+                    <div class="empty-title">Coming soon</div>
+                    <div class="empty-sub">Peek at the dev branch or ping us for access to beta builds.</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   </div>
 
-  <!-- DASHBOARD PAGE -->
-  <div id="page-dashboard" class="page">
-    <h1>Session Dashboard</h1>
-    <div class="subtitle">Stats synced from your Chrome extension · click Sync in the popup</div>
+  <div id="scroll-space"></div>
 
-    <div id="dashEmpty" class="empty">
-      <div class="e-icon">📊</div>
-      <div class="e-title">No session data yet</div>
-      <div class="e-sub">Start a session in the Chrome extension<br>then click <strong style="color:var(--accent)">Sync session to app</strong></div>
-    </div>
+  <div id="toast" class="toast hidden"></div>
 
-    <div id="dashContent" style="display:none">
-      <div class="metrics">
-        <div class="metric"><div class="m-val" id="d-time">—</div>   <div class="m-lbl">Study time</div></div>
-        <div class="metric"><div class="m-val" id="d-spikes">0</div> <div class="m-lbl">Conf. spikes</div></div>
-        <div class="metric"><div class="m-val" id="d-focus">100%</div><div class="m-lbl">Focus score</div></div>
-        <div class="metric"><div class="m-val" id="d-cards">0</div>  <div class="m-lbl">Cards done</div></div>
-      </div>
-      <div class="dash-grid">
-        <div class="dash-card">
-          <div class="dash-ttl">Confusion log</div>
-          <div id="spikeLog"></div>
-          <div class="dash-ttl" style="margin-top:16px">Score over time</div>
-          <svg class="chart-svg" id="confChart" height="70"></svg>
-        </div>
-        <div class="dash-card">
-          <div class="dash-ttl">Focus score</div>
-          <div class="focus-bg"><div class="focus-fill" id="focusFill" style="width:100%;background:var(--green)"></div></div>
-          <div style="font-size:12px;color:var(--muted)"><span id="focusVal">100</span>/100 · each spike −5 pts</div>
-          <div class="dash-ttl" style="margin-top:20px">Pomodoros</div>
-          <div class="pomo-row" id="pomoToms">—</div>
-          <div style="font-size:12px;color:var(--muted)"><span id="pomoCount">0</span> sessions completed</div>
-          <div class="dash-ttl" style="margin-top:20px">Cards completed</div>
-          <div class="big-num" id="totalCards">0</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <script>
+    const scrollTrack = document.getElementById('scroll-track');
+    const scrollSpace = document.getElementById('scroll-space');
+    const scrollHint = document.getElementById('scroll-hint');
+    const parallaxLayers = document.querySelectorAll('.parallax');
 
-</main>
-</div>
-<div class="toast" id="toast"></div>
+    let maxScroll = 0;
+    let mobileLayout = false;
 
-<script>
-const API = 'http://localhost:8001';
-const RTL  = ['Urdu','Arabic'];
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
-let flashcards=[], questions=[], fcIdx=0, mcqIdx=0, mcqDone=false, cardsDone=0, pdfText='', source='paste', studySetData=null;
-
-// ── Init ──────────────────────────────────────────────────────────────────────
-window.addEventListener('DOMContentLoaded', () => {
-  const lang = localStorage.getItem('sb_lang');
-  if (lang) document.getElementById('langSelect').value = lang;
-  pollSession();
-  setInterval(pollSession, 3000);
-});
-
-async function pollSession() {
-  try {
-    const res = await fetch(`${API}/session`);
-    if (!res.ok) return;
-    const data = await res.json();
-    if (data && data.startTime) renderDash(data);
-  } catch(e) {}
-}
-
-// ── Navigation ────────────────────────────────────────────────────────────────
-function showPage(name) {
-  document.querySelectorAll('.nav-item').forEach((b,i) => b.classList.toggle('active', ['flashcards','dashboard'][i]===name));
-  document.getElementById('page-flashcards').classList.toggle('active', name==='flashcards');
-  document.getElementById('page-dashboard').classList.toggle('active',  name==='dashboard');
-}
-
-// ── Source ────────────────────────────────────────────────────────────────────
-function setSource(s) {
-  source = s;
-  ['paste','pdf','demo','url'].forEach(x => {
-    document.getElementById(`src-${x}`).classList.toggle('active', x===s);
-    document.getElementById(`input-${x}`).style.display = x===s ? 'block' : 'none';
-  });
-}
-
-function onPDF() {
-  const file = document.getElementById('pdfFile').files[0];
-  if (!file) return;
-  document.getElementById('pdfStatus').textContent = `Loaded: ${file.name}`;
-  const reader = new FileReader();
-  reader.onload = e => { pdfText = e.target.result || `[PDF: ${file.name}]`; };
-  reader.readAsText(file);
-}
-
-function getText() {
-  if (source==='paste') return document.getElementById('pasteArea').value.trim();
-  if (source==='pdf')   return pdfText;
-  if (source==='url')   return `Fetch and summarize this URL: ${document.getElementById('urlInput').value}`;
-  const demos = {
-    photosynthesis:`Photosynthesis converts light energy into glucose: 6CO₂+6H₂O+light→C₆H₁₂O₆+6O₂. Two stages: light-dependent reactions (thylakoid membrane — splits water via photolysis, produces ATP+NADPH, releases O₂) and Calvin Cycle (stroma — RuBisCO fixes CO₂). Factors: light intensity, CO₂ concentration, temperature, water. Chlorophyll absorbs red and blue wavelengths.`,
-    newton:`Newton's Laws: 1st (Inertia) — object stays at rest/motion unless net force acts. 2nd — F=ma, force=mass×acceleration. 3rd — every action has equal opposite reaction. Momentum=mv. Impulse=F×t. Applications: rockets, seatbelts, friction, swimming.`,
-    ww2:`WWII (1939-1945): Germany invaded Poland 1939 → Allied powers formed. Japan attacked Pearl Harbor 1941 → US joined. D-Day Normandy landings June 1944. Holocaust: genocide of 6 million Jews. Atomic bombs on Hiroshima+Nagasaki August 1945. Germany surrendered May 1945, Japan September 1945. Led to UN formation and Cold War.`
-  };
-  return demos[document.getElementById('demoTopic').value] || demos.photosynthesis;
-}
-
-// ── Generate ──────────────────────────────────────────────────────────────────
-async function generate() {
-  const text = getText();
-  const lang = document.getElementById('langSelect').value;
-  if (!text) { showToast('⚠️ Add some content first'); return; }
-
-  setLoading(true, 'Generating flashcards…');
-  hideErr();
-
-  try {
-    const res = await fetch(`${API}/generate`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ text, language: lang, confusion_score: 0.3 })
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.detail || `Server error ${res.status}`);
+    function updateParallax(offset = 0) {
+      parallaxLayers.forEach(layer => {
+        const speed = parseFloat(layer.dataset.speed || 0);
+        layer.style.transform = `translateX(${offset * speed}px)`;
+      });
     }
-    const data = await res.json();
-    studySetData = data;
-    renderSet(data, lang);
-  } catch(e) {
-    showErr(e.message);
-  } finally {
-    setLoading(false);
-  }
-}
 
-// ── Language change ───────────────────────────────────────────────────────────
-function onLangChange() {
-  const lang = document.getElementById('langSelect').value;
-  localStorage.setItem('sb_lang', lang);
-  if (studySetData) translateSet(lang);
-}
+    function syncHorizontal() {
+      if (mobileLayout) return;
+      const scrollY = clamp(window.scrollY, 0, maxScroll);
+      scrollTrack.style.transform = `translateX(${-scrollY}px)`;
+      updateParallax(scrollY);
+      if (scrollHint && !scrollHint.classList.contains('fade') && scrollY > 30) {
+        scrollHint.classList.add('fade');
+      }
+    }
 
-async function translateSet(lang) {
-  if (!studySetData) return;
-  setLoading(true, `Translating to ${lang}…`);
-  try {
-    const res = await fetch(`${API}/translate`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ study_set: studySetData, language: lang })
+    function computeHorizontalLayout() {
+      mobileLayout = window.innerWidth <= 900;
+      if (mobileLayout) {
+        document.body.classList.add('is-mobile');
+        scrollTrack.style.transform = 'translateX(0)';
+        updateParallax(0);
+        scrollSpace.style.height = '0px';
+        return;
+      }
+      document.body.classList.remove('is-mobile');
+      const trackWidth = scrollTrack.scrollWidth;
+      maxScroll = Math.max(0, trackWidth - window.innerWidth);
+      scrollSpace.style.height = `${maxScroll + window.innerHeight * 0.2}px`;
+      syncHorizontal();
+    }
+
+    window.addEventListener('scroll', syncHorizontal, { passive: true });
+    window.addEventListener('resize', computeHorizontalLayout);
+    window.addEventListener('load', () => {
+      computeHorizontalLayout();
+      setTimeout(computeHorizontalLayout, 200);
     });
-    const data = await res.json();
-    renderSet(data, lang);
-    studySetData = data;
-  } catch(e) {
-    showToast('Translation failed');
-  } finally {
-    setLoading(false);
-  }
-}
 
-async function detectLang() {
-  const text = getText();
-  if (!text) { showToast('Add text first'); return; }
-  const btn = document.querySelector('.detect-btn');
-  btn.textContent = '⏳'; btn.disabled = true;
-  try {
-    const res = await fetch(`${API}/detect-lang`, {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ text: text.slice(0,300) })
+    /* ---- StudyBuddy logic ---- */
+
+    const manualPanels = {
+      demo: document.getElementById('manual-demo-panel'),
+      paste: document.getElementById('manual-paste-panel'),
+      upload: document.getElementById('manual-upload-panel')
+    };
+
+    function updateManualPanels(value) {
+      Object.entries(manualPanels).forEach(([key, panel]) => {
+        panel.classList.toggle('hidden', key !== value);
+      });
+    }
+
+    document.querySelectorAll('input[name="manual-mode"]').forEach(radio => {
+      radio.addEventListener('change', (e) => {
+        updateManualPanels(e.target.value);
+      });
     });
-    const data = await res.json();
-    const detected = data.language;
-    const opts = Array.from(document.getElementById('langSelect').options);
-    const match = opts.find(o => o.value.toLowerCase()===detected.toLowerCase());
-    if (match) { document.getElementById('langSelect').value = match.value; showToast(`Detected: ${match.value}`); }
-    else showToast(`Detected: ${detected}`);
-  } catch(e) { showToast('Detection failed'); }
-  finally { btn.textContent = '🔍 Auto-detect language'; btn.disabled = false; }
-}
 
-// ── Render set ────────────────────────────────────────────────────────────────
-function renderSet(data, lang) {
-  flashcards = data.flashcards || [];
-  questions  = data.questions  || [];
-  fcIdx = 0; mcqIdx = 0; cardsDone = 0;
+    updateManualPanels(document.querySelector('input[name="manual-mode"]:checked').value);
 
-  const isRTL = RTL.includes(lang);
-  if (data.summary) {
-    document.getElementById('summaryBox').textContent = data.summary;
-    document.getElementById('summaryBox').className = `summary on${isRTL?' rtl':''}`;
-  }
-  document.getElementById('studySet').style.display = 'block';
-  renderCard(isRTL);
-  renderMCQ(isRTL);
-}
+    const demoLessons = {
+      photosynthesis: {
+        app: 'Biology • Chapter 6',
+        topic: 'Photosynthesis',
+        summary: `Photosynthesis is the biochemical process plants use to convert sunlight into chemical energy. Light-dependent reactions capture photons, while the light-independent Calvin cycle assembles sugars.`,
+        keywords: ['chloroplast', 'chlorophyll', 'light reactions', 'calvin cycle', 'stomata', 'ATP', 'NADPH'],
+        notes: [
+          'Light-dependent reactions take place in the thylakoid membranes and split water, releasing oxygen.',
+          'ATP and NADPH generated during the light reactions power the Calvin cycle in the stroma.',
+          'Carbon fixation attaches CO₂ to RuBP, producing G3P that plants use to build glucose and other carbohydrates.'
+        ],
+        flashcards: [
+          {
+            term: 'Chlorophyll',
+            definition: 'The green pigment embedded in the thylakoid membranes that absorbs blue and red light.',
+            hint: 'Think of the molecule that gives plants their color.'
+          },
+          {
+            term: 'Light-dependent reactions',
+            definition: 'Photon-driven reactions that split water, release O₂, and produce ATP and NADPH.',
+            hint: 'Occurs first, on the thylakoid membranes.'
+          },
+          {
+            term: 'Calvin cycle',
+            definition: 'A series of enzyme-driven steps in the stroma that fix CO₂ into triose sugars.',
+            hint: 'Also called the light-independent reactions.'
+          }
+        ],
+        mcq: [
+          {
+            question: 'Which molecule donates electrons to the photosynthetic electron transport chain?',
+            options: ['NADPH', 'Water', 'Oxygen', 'Carbon dioxide'],
+            answer: 1,
+            correct: 'Correct! Water is split during photolysis, releasing electrons, protons and oxygen gas.',
+            explanations: [
+              'NADPH carries electrons away from the light reactions; it is a product, not the initial donor.',
+              '',
+              'Oxygen is released as a by-product after water is split.',
+              'Carbon dioxide is a substrate for the Calvin cycle, not the electron donor.'
+            ]
+          }
+        ]
+      },
+      newton_laws: {
+        app: 'Physics • Mechanics',
+        topic: 'Newton’s Laws of Motion',
+        summary: `Newton’s three laws describe how forces influence motion: inertia, F = ma, and equal-opposite reactions. Together they explain everything from seatbelt safety to rocket thrust.`,
+        keywords: ['inertia', 'net force', 'acceleration', 'action-reaction', 'mass'],
+        notes: [
+          'First law: An object maintains its velocity unless acted upon by a net external force.',
+          'Second law: The acceleration of an object is proportional to net force and inversely proportional to mass (F = ma).',
+          'Third law: Forces occur in equal and opposite pairs acting on different bodies.'
+        ],
+        flashcards: [
+          {
+            term: 'Inertia',
+            definition: 'The tendency of an object to resist changes in its state of motion.',
+            hint: 'Directly related to mass.'
+          },
+          {
+            term: 'Second law equation',
+            definition: 'F = m × a, linking net force, mass, and acceleration.',
+            hint: 'The law engineers use to size thrusters.'
+          },
+          {
+            term: 'Third law example',
+            definition: 'When a rocket expels gas downward, the rocket is pushed upward with equal force.',
+            hint: 'Every action has …'
+          }
+        ],
+        mcq: [
+          {
+            question: 'A 2 kg block experiences a net force of 10 N. What is its acceleration?',
+            options: ['0.2 m/s²', '2 m/s²', '5 m/s²', '20 m/s²'],
+            answer: 2,
+            correct: 'Correct! Using F = ma gives a = 10 ÷ 2 = 5 m/s².',
+            explanations: [
+              'Check your math: 10 N ÷ 2 kg = 5 m/s².',
+              'Close! 2 m/s² would result from a 4 N net force.',
+              '',
+              '20 m/s² would require a 40 N force on a 2 kg object.'
+            ]
+          }
+        ]
+      }
+    };
 
-// ── Flashcard ─────────────────────────────────────────────────────────────────
-function renderCard(isRTL = RTL.includes(document.getElementById('langSelect').value)) {
-  if (!flashcards.length) return;
-  const c = flashcards[fcIdx];
-  document.getElementById('fcF').textContent   = c.front;
-  document.getElementById('fcB').textContent   = c.back;
-  document.getElementById('fcH').textContent   = c.hint ? `💡 ${c.hint}` : '';
-  document.getElementById('fcCtr').textContent = `Card ${fcIdx+1} of ${flashcards.length}`;
-  document.getElementById('fcInner').classList.remove('flipped');
-  ['fcF','fcB'].forEach(id => document.getElementById(id).classList.toggle('rtl', isRTL));
-}
+    const statusText = document.getElementById('status-text');
+    const screenPanel = document.getElementById('screen-panel');
+    const flashcardSection = document.getElementById('flashcard-section');
+    const summaryBox = document.getElementById('summary-box');
+    const flashTabsEl = document.getElementById('flash-tabs');
+    const cardsPane = document.getElementById('cards-pane');
+    const quizPane = document.getElementById('quiz-pane');
+    const fcWrap = document.getElementById('fc-wrap');
+    const fcInner = document.getElementById('fc-inner');
+    const fcFront = document.getElementById('fc-front');
+    const fcBack = document.getElementById('fc-back');
+    const fcHint = document.getElementById('fc-hint');
+    const fcCounter = document.getElementById('fc-counter');
+    const fcProgress = document.getElementById('fc-progress');
+    const fcPrevBtn = document.getElementById('fc-prev');
+    const fcNextBtn = document.getElementById('fc-next');
+    const fcGotBtn = document.getElementById('fc-got');
+    const flashcardList = document.getElementById('flashcard-list');
+    const mcqCounterEl = document.getElementById('mcq-counter');
+    const mcqQuestionEl = document.getElementById('mcq-question');
+    const mcqOptionsEl = document.getElementById('mcq-options');
+    const mcqFeedback = document.getElementById('mcq-feedback');
+    const mcqNextBtn = document.getElementById('mcq-next');
+    const confusionBadge = document.getElementById('confusion-badge');
+    const confusionBar = document.getElementById('confusion-bar');
+    const statCardsEl = document.getElementById('stat-cards');
+    const statSpikesEl = document.getElementById('stat-spikes');
+    const statFocusEl = document.getElementById('stat-focus');
+    const statTimeEl = document.getElementById('stat-time');
+    const focusAlert = document.getElementById('focus-alert');
+    const toast = document.getElementById('toast');
+    const sbCardsSidebar = document.getElementById('sb-cards');
+    const sbSpikesSidebar = document.getElementById('sb-spikes');
+    const focusValSidebar = document.getElementById('focusValSidebar');
 
-function flip() { document.getElementById('fcInner').classList.toggle('flipped'); }
-function fcNav(d) { fcIdx = Math.max(0, Math.min(flashcards.length-1, fcIdx+d)); renderCard(); }
-function fcGot() {
-  cardsDone++;
-  document.getElementById('sb-cards').textContent = cardsDone;
-  showToast('Card remembered! 🎉');
-  if (fcIdx < flashcards.length-1) { fcIdx++; renderCard(); }
-}
+    const API = 'http://localhost:8000';
+    const RTL = ['Urdu', 'Arabic'];
 
-// ── MCQ ───────────────────────────────────────────────────────────────────────
-function renderMCQ(isRTL = RTL.includes(document.getElementById('langSelect').value)) {
-  if (!questions.length) return;
-  const q = questions[mcqIdx];
-  mcqDone = false;
-  document.getElementById('mcqCtr').textContent = `Question ${mcqIdx+1} of ${questions.length}`;
-  const qEl = document.getElementById('mcqQ');
-  qEl.textContent = q.question;
-  qEl.classList.toggle('rtl', isRTL);
-  document.getElementById('mcqExp').className  = 'mcq-exp';
-  document.getElementById('mcqNext').className = 'mcq-next';
-  document.getElementById('mcqOpts').innerHTML = q.options.map((o,i) =>
-    `<div class="mcq-opt${isRTL?' rtl':''}" onclick="answer(${i})" data-i="${i}"><span class="mcq-ltr">${'ABCD'[i]}</span><span>${o}</span></div>`
-  ).join('');
-}
+    let toastTimeout;
+    let confusionSpikes = 0;
+    let focusAlerts = 0;
+    let sessionTimer = null;
+    let sessionStart = null;
 
-function answer(chosen) {
-  if (mcqDone) return;
-  mcqDone = true;
-  const q = questions[mcqIdx];
-  document.querySelectorAll('#mcqOpts .mcq-opt').forEach((el,i) => {
-    if (i===q.correct_index) el.classList.add('correct');
-    else if (i===chosen)     el.classList.add('wrong');
-  });
-  document.getElementById('mcqExp').textContent = q.explanation;
-  document.getElementById('mcqExp').className = 'mcq-exp on';
-  if (mcqIdx < questions.length-1) document.getElementById('mcqNext').className = 'mcq-next on';
-}
+    let flashcards = [];
+    let questions = [];
+    let fcIdx = 0;
+    let mcqIdx = 0;
+    let cardsDone = 0;
+    let mcqDone = false;
+    let masteredCards = new Set();
+    let pdfText = '';
+    let source = 'paste';
+    let studySetData = null;
+    let sessionPollInterval = null;
 
-function nextQ() { mcqIdx++; renderMCQ(); }
+    document.addEventListener('DOMContentLoaded', () => {
+      const langSel = document.getElementById('langSelect');
+      if (langSel) {
+        const stored = localStorage.getItem('sb_lang');
+        if (stored) langSel.value = stored;
+        langSel.addEventListener('change', onLangChange);
+      }
 
-function setInner(tab) {
-  document.querySelectorAll('.itab').forEach((b,i) => b.classList.toggle('active', ['cards','quiz'][i]===tab));
-  document.getElementById('inner-cards').style.display = tab==='cards' ? 'block' : 'none';
-  document.getElementById('inner-quiz').style.display  = tab==='quiz'  ? 'block' : 'none';
-}
+      const detectBtn = document.getElementById('detect-lang-btn');
+      if (detectBtn) detectBtn.addEventListener('click', detectLang);
 
-// ── Dashboard ─────────────────────────────────────────────────────────────────
-function renderDash(s) {
-  document.getElementById('dashEmpty').style.display   = 'none';
-  document.getElementById('dashContent').style.display = 'block';
+      document.querySelectorAll('.src-card').forEach(card => {
+        card.addEventListener('click', () => setSource(card.dataset.source));
+        card.addEventListener('keydown', (evt) => {
+          if (evt.key === 'Enter' || evt.key === ' ') {
+            evt.preventDefault();
+            setSource(card.dataset.source);
+          }
+        });
+      });
 
-  if (s.startTime) {
-    const e = Math.floor((Date.now()-s.startTime)/1000);
-    document.getElementById('d-time').textContent = `${Math.floor(e/60)}m${e%60}s`;
-  }
-  document.getElementById('d-spikes').textContent = s.confusionSpikes||0;
-  document.getElementById('d-focus').textContent  = `${s.focusScore||100}%`;
-  document.getElementById('d-cards').textContent  = (s.cardsDone||0)+cardsDone;
-  document.getElementById('sb-spikes').textContent= s.confusionSpikes||0;
+      const pdfInput = document.getElementById('pdfFile');
+      if (pdfInput) pdfInput.addEventListener('change', onPDF);
 
-  const f = s.focusScore||100;
-  document.getElementById('focusVal').textContent = f;
-  document.getElementById('focusFill').style.width = `${f}%`;
-  document.getElementById('focusFill').style.background = f>70?'var(--green)':f>40?'var(--orange)':'var(--red)';
+      const genBtn = document.getElementById('genBtn');
+      if (genBtn) genBtn.addEventListener('click', generate);
 
-  const p = s.pomodorosDone||0;
-  document.getElementById('pomoCount').textContent = p;
-  document.getElementById('pomoToms').textContent  = p>0 ? '🍅'.repeat(Math.min(p,10)) : '—';
-  document.getElementById('totalCards').textContent= (s.cardsDone||0)+cardsDone;
+      pollSession();
+      sessionPollInterval = setInterval(pollSession, 3000);
+    });
 
-  const log = s.confusionLog||[];
-  document.getElementById('spikeLog').innerHTML = log.slice(-8).reverse().map(e => {
-    const t = new Date(e.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    const c = e.score<0.35?'var(--green)':e.score<0.65?'var(--orange)':'var(--red)';
-    return `<div class="spike-row"><div class="s-dot" style="background:${c}"></div><span class="s-time">${t}</span><span>${e.score.toFixed(2)}</span></div>`;
-  }).join('') || '<div style="font-size:12px;color:var(--muted)">No spikes yet</div>';
+    if (flashTabsEl) {
+      flashTabsEl.addEventListener('click', (event) => {
+        const button = event.target.closest('.flash-tab');
+        if (!button) return;
+        setFlashTab(button.dataset.tab);
+      });
+    }
 
-  if (log.length>1) drawChart(log);
-}
+    if (fcWrap) {
+      fcWrap.addEventListener('click', () => {
+        if (!flashcards.length) return;
+        fcInner.classList.toggle('flipped');
+      });
+    }
 
-function drawChart(log) {
-  const svg = document.getElementById('confChart');
-  const W = svg.parentElement.clientWidth||300, H=65;
-  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
-  const scores = log.map(e=>e.score);
-  const pts = scores.map((s,i)=>{
-    const x=(i/(scores.length-1))*(W-20)+10;
-    const y=H-8-s*(H-18);
-    return `${x},${y}`;
-  }).join(' ');
-  svg.innerHTML=`<polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>
-  ${scores.map((s,i)=>{const x=(i/(scores.length-1))*(W-20)+10,y=H-8-s*(H-18),c=s<0.35?'var(--green)':s<0.65?'var(--orange)':'var(--red)';return`<circle cx="${x}" cy="${y}" r="3" fill="${c}"/>`;}).join('')}`;
-}
+    if (fcPrevBtn) fcPrevBtn.addEventListener('click', () => navigateFlashcard(-1));
+    if (fcNextBtn) fcNextBtn.addEventListener('click', () => navigateFlashcard(1));
+    if (fcGotBtn) fcGotBtn.addEventListener('click', markFlashcardAsMastered);
 
-// ── Utils ─────────────────────────────────────────────────────────────────────
-function setLoading(on, txt='') {
-  document.getElementById('fcLoader').classList.toggle('on', on);
-  document.getElementById('genBtn').disabled = on;
-  if (txt) document.getElementById('loaderTxt').textContent = txt;
-  if (on) document.getElementById('studySet').style.display = 'none';
-}
+    if (flashcardList) {
+      flashcardList.addEventListener('click', (event) => {
+        const cardEl = event.target.closest('.flashcard');
+        if (!cardEl) return;
+        const index = Number(cardEl.dataset.index);
+        if (Number.isNaN(index)) return;
+        fcIdx = index;
+        renderActiveFlashcard();
+        setFlashTab('cards');
+      });
+    }
 
-function showErr(msg) {
-  const el = document.getElementById('errBox');
-  el.textContent = `⚠️ ${msg}`;
-  el.classList.add('on');
-}
-function hideErr() { document.getElementById('errBox').classList.remove('on'); }
+    if (mcqOptionsEl) {
+      mcqOptionsEl.addEventListener('click', (event) => {
+        const optionEl = event.target.closest('.quiz-option');
+        if (!optionEl) return;
+        const index = Number(optionEl.dataset.index);
+        if (Number.isNaN(index)) return;
+        answerQuestion(index);
+      });
+    }
 
-let toastT;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('on');
-  clearTimeout(toastT);
-  toastT = setTimeout(()=>t.classList.remove('on'), 3000);
-}
-</script>
+    if (mcqNextBtn) mcqNextBtn.addEventListener('click', nextQuestion);
+
+    function showToast(message, type = 'success') {
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.classList.remove('hidden');
+
+      requestAnimationFrame(() => toast.classList.add('show'));
+
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.classList.add('hidden'), 260);
+      }, 3200);
+    }
+
+    function startTimer() {
+      if (sessionTimer) return;
+      sessionStart = Date.now();
+      sessionTimer = setInterval(() => {
+        const elapsed = Date.now() - sessionStart;
+        const minutes = Math.floor(elapsed / 60000);
+        const seconds = Math.floor((elapsed % 60000) / 1000);
+        statTimeEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      }, 1000);
+    }
+
+    function updateStatus(message, color = 'var(--accent-3)') {
+        statusText.textContent = message;
+        statusText.style.color = color;
+    }
+
+    function renderLesson(lesson, sourceLabel, options = {}) {
+      if (!options.preserveStudySet) {
+        studySetData = null;
+      }
+
+      const keywords = lesson.keywords?.map(word => `<span class="screen-kw">${word}</span>`).join('') || '';
+      const notes = lesson.notes?.map(note => `<p>${note}</p>`).join('') || '';
+
+      screenPanel.innerHTML = `
+        <div class="screen-app">${lesson.app || 'Notebook mode'}</div>
+        <h3 class="screen-topic">${lesson.topic || 'Study set'}</h3>
+        <p class="screen-summary">${lesson.summary || ''}</p>
+        <div class="keyword-row">${keywords}</div>
+        ${lesson.notes && lesson.notes.length ? `<details><summary>Key takeaways</summary>${notes}</details>` : ''}
+      `;
+
+      flashcards = Array.isArray(lesson.flashcards)
+        ? lesson.flashcards.map((card, index) => ({
+            term: card.term || card.front || `Card ${index + 1}`,
+            definition: card.definition || card.back || '',
+            hint: card.hint || ''
+          }))
+        : [];
+
+      const hasCards = flashcards.length > 0;
+
+      cardsDone = 0;
+      masteredCards = new Set();
+      if (sbCardsSidebar) sbCardsSidebar.textContent = cardsDone;
+      statCardsEl.textContent = hasCards ? `${cardsDone}/${flashcards.length}` : '0';
+
+      questions = Array.isArray(lesson.mcq)
+        ? lesson.mcq.map(item => ({
+            question: item.question,
+            options: item.options || [],
+            correct_index: typeof item.answer === 'number'
+              ? item.answer
+              : (typeof item.correct_index === 'number' ? item.correct_index : 0),
+            explanation: item.correct || item.explanation || '',
+            explanations: item.explanations || []
+          }))
+        : [];
+
+      fcIdx = 0;
+      mcqIdx = 0;
+      mcqDone = false;
+
+      if (summaryBox) {
+        summaryBox.textContent = lesson.summary || '';
+        summaryBox.classList.toggle('hidden', !lesson.summary);
+      }
+
+      if (hasCards) {
+        renderFlashcardList();
+        renderActiveFlashcard();
+      } else if (flashcardList) {
+        flashcardList.innerHTML = '';
+        fcFront.textContent = 'No flashcards yet.';
+        fcBack.textContent = '';
+        if (fcHint) {
+          fcHint.textContent = '';
+          fcHint.classList.add('hidden');
+        }
+        if (fcCounter) fcCounter.textContent = '—';
+      }
+
+      const hasQuiz = questions.length > 0;
+      if (hasQuiz) {
+        renderMCQ();
+      } else {
+        if (mcqQuestionEl) mcqQuestionEl.textContent = '';
+        if (mcqOptionsEl) mcqOptionsEl.innerHTML = '';
+        if (mcqFeedback) {
+          mcqFeedback.textContent = '';
+          mcqFeedback.classList.add('hidden');
+          mcqFeedback.classList.remove('success', 'error');
+        }
+        if (mcqNextBtn) mcqNextBtn.classList.add('hidden');
+      }
+
+      if (flashcardSection) {
+        flashcardSection.classList.toggle('hidden', !(hasCards || hasQuiz || lesson.summary));
+      }
+      if (cardsPane) cardsPane.classList.toggle('hidden', !hasCards);
+      if (quizPane) quizPane.classList.toggle('hidden', !hasQuiz);
+
+      if (flashTabsEl) {
+        const shouldShowTabs = hasCards && hasQuiz;
+        flashTabsEl.classList.toggle('hidden', !shouldShowTabs);
+        if (!shouldShowTabs) {
+          setFlashTab(hasCards ? 'cards' : 'quiz');
+        } else {
+          setFlashTab('cards');
+        }
+      } else {
+        setFlashTab(hasCards ? 'cards' : 'quiz');
+      }
+
+      updateFlashProgress();
+
+      updateStatus(`● Notebook mode — ${sourceLabel} loaded`);
+      showToast(`Loaded ${lesson.topic || 'study set'}. Happy studying!`, 'success');
+      startTimer();
+    }
+
+    function setFlashTab(tab) {
+      if (flashTabsEl) {
+        flashTabsEl.querySelectorAll('.flash-tab').forEach(button => {
+          button.classList.toggle('active', button.dataset.tab === tab);
+        });
+      }
+
+      if (cardsPane) cardsPane.classList.toggle('hidden', !(tab === 'cards' && flashcards.length));
+      if (quizPane) quizPane.classList.toggle('hidden', !(tab === 'quiz' && questions.length));
+    }
+
+    function renderFlashcardList() {
+      if (!flashcardList) return;
+      flashcardList.innerHTML = flashcards.map((card, index) => `
+        <article class="flashcard" data-index="${index}">
+          <div class="flashcard-term">${index + 1}. ${card.term}</div>
+          <div class="flashcard-def">${card.definition}</div>
+          ${card.hint ? `<div class="flashcard-hint">Hint: ${card.hint}</div>` : ''}
+        </article>
+      `).join('');
+      updateFlashcardListState();
+    }
+
+    function updateFlashcardListState() {
+      if (!flashcardList) return;
+      const items = flashcardList.querySelectorAll('.flashcard');
+      items.forEach(item => {
+        const idx = Number(item.dataset.index);
+        item.classList.toggle('is-active', idx === fcIdx);
+        item.classList.toggle('is-mastered', masteredCards.has(idx));
+      });
+    }
+
+    function renderActiveFlashcard() {
+      if (!flashcards.length) return;
+      const card = flashcards[fcIdx];
+
+      if (fcFront) fcFront.textContent = card.term;
+      if (fcBack) fcBack.textContent = card.definition;
+      if (fcHint) {
+        if (card.hint) {
+          fcHint.textContent = card.hint;
+          fcHint.classList.remove('hidden');
+        } else {
+          fcHint.textContent = '';
+          fcHint.classList.add('hidden');
+        }
+      }
+      if (fcCounter) fcCounter.textContent = `Card ${fcIdx + 1} of ${flashcards.length}`;
+      if (fcPrevBtn) fcPrevBtn.disabled = fcIdx === 0;
+      if (fcNextBtn) fcNextBtn.disabled = fcIdx === flashcards.length - 1;
+      if (fcInner) fcInner.classList.remove('flipped');
+
+      updateFlashcardListState();
+    }
+
+    function updateFlashProgress() {
+      if (!fcProgress) return;
+      if (!flashcards.length) {
+        fcProgress.textContent = '';
+        fcProgress.classList.add('hidden');
+        return;
+      }
+      fcProgress.textContent = `${cardsDone} of ${flashcards.length} mastered`;
+      fcProgress.classList.remove('hidden');
+    }
+
+    function navigateFlashcard(step) {
+      if (!flashcards.length) return;
+      const nextIndex = Math.min(Math.max(fcIdx + step, 0), flashcards.length - 1);
+      if (nextIndex === fcIdx) return;
+      fcIdx = nextIndex;
+      renderActiveFlashcard();
+    }
+
+    function markFlashcardAsMastered() {
+      if (!flashcards.length) return;
+      if (!masteredCards.has(fcIdx)) {
+        masteredCards.add(fcIdx);
+        cardsDone = masteredCards.size;
+        statCardsEl.textContent = `${cardsDone}/${flashcards.length}`;
+        if (sbCardsSidebar) sbCardsSidebar.textContent = cardsDone;
+        updateFlashProgress();
+        updateFlashcardListState();
+        showToast('Card remembered! 🎉', 'success');
+      }
+      if (fcIdx < flashcards.length - 1) {
+        fcIdx += 1;
+        renderActiveFlashcard();
+      }
+    }
+
+    function renderMCQ() {
+      if (!questions.length) return;
+      const question = questions[mcqIdx];
+      mcqDone = false;
+
+      if (mcqCounterEl) mcqCounterEl.textContent = `Question ${mcqIdx + 1} of ${questions.length}`;
+      if (mcqQuestionEl) mcqQuestionEl.textContent = question.question;
+      if (mcqFeedback) {
+        mcqFeedback.textContent = '';
+        mcqFeedback.classList.add('hidden');
+        mcqFeedback.classList.remove('success', 'error');
+      }
+      if (mcqNextBtn) mcqNextBtn.classList.add('hidden');
+
+      if (mcqOptionsEl) {
+        mcqOptionsEl.innerHTML = question.options.map((option, index) => `
+          <button type="button" class="quiz-option" data-index="${index}">
+            <span class="quiz-letter">${String.fromCharCode(65 + index)}.</span>
+            <span>${option}</span>
+          </button>
+        `).join('');
+      }
+    }
+
+    function answerQuestion(index) {
+      if (mcqDone || !questions.length) return;
+      mcqDone = true;
+      const question = questions[mcqIdx];
+      const options = mcqOptionsEl ? Array.from(mcqOptionsEl.querySelectorAll('.quiz-option')) : [];
+      options.forEach((optionEl, idx) => {
+        optionEl.disabled = true;
+        optionEl.classList.toggle('correct', idx === question.correct_index);
+        optionEl.classList.toggle('wrong', idx === index && idx !== question.correct_index);
+      });
+
+      if (mcqFeedback) {
+        const isCorrect = index === question.correct_index;
+        let message = '';
+        if (isCorrect) {
+          message = question.explanation || 'Correct! Nicely done.';
+          mcqFeedback.classList.add('success');
+          mcqFeedback.classList.remove('error');
+        } else {
+          const explanation = question.explanations?.[index] || 'Not quite — review the card and try again.';
+          message = explanation;
+          mcqFeedback.classList.add('error');
+          mcqFeedback.classList.remove('success');
+        }
+        mcqFeedback.textContent = message;
+        mcqFeedback.classList.remove('hidden');
+      }
+
+      if (mcqNextBtn) {
+        if (mcqIdx < questions.length - 1) {
+          mcqNextBtn.classList.remove('hidden');
+        } else {
+          mcqNextBtn.classList.add('hidden');
+          showToast('Quiz complete! Great job.', 'success');
+        }
+      }
+    }
+
+    function nextQuestion() {
+      if (mcqIdx >= questions.length - 1) return;
+      mcqIdx += 1;
+      renderMCQ();
+    }
+
+    document.getElementById('load-demo-btn').addEventListener('click', () => {
+      const topic = document.getElementById('demo-topic').value;
+      const lesson = demoLessons[topic];
+      if (!lesson) return;
+      renderLesson(lesson, 'demo lesson');
+    });
+
+    document.getElementById('use-text-btn').addEventListener('click', () => {
+      const text = document.getElementById('manual-text').value.trim();
+      if (!text) {
+        showToast('Paste some text before loading.', 'error');
+        return;
+      }
+      const sentences = text.split(/(?<=[.!?])\s+/).filter(Boolean);
+      const summary = sentences.slice(0, 2).join(' ') || text.slice(0, 180);
+      const words = text.toLowerCase().match(/\b[a-z]{5,}\b/g) || [];
+      const keywords = Array.from(new Set(words)).slice(0, 6);
+      const flashcardsFromText = sentences.slice(0, 3).map((sentence, index) => ({
+        term: `Key idea ${index + 1}`,
+        definition: sentence.trim()
+      }));
+
+      const lesson = {
+        app: 'Manual notes',
+        topic: sentences[0]?.split(/\s+/).slice(0, 6).join(' ') || 'Custom notes',
+        summary,
+        keywords,
+        notes: sentences.slice(2, 5),
+        flashcards: flashcardsFromText
+      };
+
+      renderLesson(lesson, 'your pasted text');
+    });
+
+    document.getElementById('simulate-confusion-btn').addEventListener('click', () => {
+      confusionSpikes += 1;
+      statSpikesEl.textContent = confusionSpikes;
+      if (sbSpikesSidebar) sbSpikesSidebar.textContent = confusionSpikes;
+      const randomLevel = Math.random() * 0.4 + 0.5;
+      updateConfusionDisplay(randomLevel);
+      showToast('Confusion spike simulated.', 'error');
+    });
+
+    document.getElementById('simulate-focus-btn').addEventListener('click', () => {
+      focusAlerts += 1;
+      statFocusEl.textContent = focusAlerts;
+      focusAlert.classList.remove('hidden');
+      showToast('Focus dropped — get back to your notes!', 'error');
+    });
+
+    document.getElementById('focus-dismiss-btn').addEventListener('click', () => {
+      focusAlert.classList.add('hidden');
+      showToast('Nice! Focus alert dismissed.', 'success');
+    });
+
+    function updateConfusionDisplay(level) {
+      const percentage = Math.max(5, Math.min(100, Math.round(level * 100)));
+      confusionBar.style.width = `${percentage}%`;
+
+      let badgeClass = 'score-low';
+      let color = 'var(--accent-3)';
+      if (percentage > 66) {
+        badgeClass = 'score-high';
+        color = 'var(--accent-2)';
+      } else if (percentage > 33) {
+        badgeClass = 'score-medium';
+        color = 'var(--accent-4)';
+      }
+
+      confusionBadge.classList.remove('score-low', 'score-medium', 'score-high');
+      confusionBadge.classList.add(badgeClass);
+      confusionBadge.textContent = `Confusion: ${badgeClass.split('-')[1]} (${level.toFixed(2)})`;
+      confusionBar.style.background = color;
+    }
+
+    confusionBar.style.width = '12%';
+
+    /* ---- Studio generator & dashboard (from second code) ---- */
+
+    function showPage(name) {
+      document.querySelectorAll('.pro-nav').forEach(nav => {
+        nav.classList.toggle('active', nav.dataset.page === name);
+      });
+      document.querySelectorAll('.studio-page').forEach(page => {
+        page.classList.toggle('active', page.id === `page-${name}`);
+      });
+    }
+
+    function setSource(s) {
+      source = s;
+      document.querySelectorAll('.src-card').forEach(card => {
+        card.classList.toggle('active', card.dataset.source === s);
+      });
+      ['paste', 'pdf', 'demo', 'url'].forEach(key => {
+        const panel = document.getElementById(`input-${key}`);
+        if (panel) panel.classList.toggle('hidden', key !== s);
+      });
+    }
+
+    function onPDF() {
+      const file = document.getElementById('pdfFile').files[0];
+      const statusEl = document.getElementById('pdfStatus');
+      if (!file) {
+        pdfText = '';
+        if (statusEl) statusEl.textContent = '';
+        return;
+      }
+      if (statusEl) statusEl.textContent = `Loaded: ${file.name}`;
+      const reader = new FileReader();
+      reader.onload = e => {
+        pdfText = e.target.result || `[PDF: ${file.name}]`;
+      };
+      reader.readAsText(file);
+    }
+
+    const generatorDemos = {
+      photosynthesis: `Photosynthesis converts light energy into glucose: 6CO₂+6H₂O+light→C₆H₁₂O₆+6O₂. Two stages: light-dependent reactions (thylakoid membrane — splits water via photolysis, produces ATP+NADPH, releases O₂) and Calvin Cycle (stroma — RuBisCO fixes CO₂). Factors: light intensity, CO₂ concentration, temperature, water. Chlorophyll absorbs red and blue wavelengths.`,
+      newton: `Newton's Laws: 1st (Inertia) — object stays at rest/motion unless net force acts. 2nd — F=ma, force=mass×acceleration. 3rd — every action has equal opposite reaction. Momentum=mv. Impulse=F×t. Applications: rockets, seatbelts, friction, swimming.`,
+      ww2: `WWII (1939-1945): Germany invaded Poland 1939 → Allied powers formed. Japan attacked Pearl Harbor 1941 → US joined. D-Day Normandy landings June 1944. Holocaust: genocide of 6 million Jews. Atomic bombs on Hiroshima+Nagasaki August 1945. Germany surrendered May 1945, Japan September 1945. Led to UN formation and Cold War.`
+    };
+
+    function getText() {
+      if (source === 'paste') return document.getElementById('pasteArea').value.trim();
+      if (source === 'pdf')   return pdfText;
+      if (source === 'url') {
+        const url = document.getElementById('urlInput').value.trim();
+        return url ? `Fetch and summarize this URL: ${url}` : '';
+      }
+      const key = document.getElementById('demoTopic').value;
+      return generatorDemos[key] || generatorDemos.photosynthesis;
+    }
+
+    async function generate() {
+      const text = getText();
+      const langSel = document.getElementById('langSelect');
+      const lang = langSel ? langSel.value : 'English';
+
+      if (!text) {
+        showToast('⚠️ Add some content first', 'error');
+        return;
+      }
+
+      setLoading(true, 'Generating flashcards…');
+      hideErr();
+
+      try {
+        const res = await fetch(`${API}/generate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, language: lang, confusion_score: 0.3 })
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || `Server error ${res.status}`);
+        }
+        const data = await res.json();
+        renderSet(data, lang);
+      } catch (e) {
+        showErr(e.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    function onLangChange() {
+      const lang = document.getElementById('langSelect').value;
+      localStorage.setItem('sb_lang', lang);
+      translateSet(lang);
+    }
+
+    async function translateSet(lang) {
+      if (!studySetData) return;
+      setLoading(true, `Translating to ${lang}…`);
+      hideErr();
+      try {
+        const res = await fetch(`${API}/translate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ study_set: studySetData, language: lang })
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || `Translation error ${res.status}`);
+        }
+        const data = await res.json();
+        renderSet(data, lang);
+      } catch (e) {
+        showToast('Translation failed', 'error');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function detectLang() {
+      const text = getText();
+      if (!text) {
+        showToast('Add text first', 'error');
+        return;
+      }
+      const btn = document.getElementById('detect-lang-btn');
+      if (btn) {
+        btn.textContent = '⏳';
+        btn.disabled = true;
+      }
+      try {
+        const res = await fetch(`${API}/detect-lang`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text.slice(0, 300) })
+        });
+        if (!res.ok) throw new Error('Detection failed');
+        const data = await res.json();
+        const detected = data.language;
+        const langSel = document.getElementById('langSelect');
+        const options = Array.from(langSel.options);
+        const match = options.find(o => o.value.toLowerCase() === detected.toLowerCase());
+        if (match) {
+          langSel.value = match.value;
+          localStorage.setItem('sb_lang', match.value);
+          showToast(`Detected: ${match.value}`, 'success');
+          translateSet(match.value);
+        } else {
+          showToast(`Detected: ${detected}`, 'success');
+        }
+      } catch (e) {
+        showToast('Detection failed', 'error');
+      } finally {
+        if (btn) {
+          btn.textContent = '🔍 Auto-detect language';
+          btn.disabled = false;
+        }
+      }
+    }
+
+    function renderSet(data, lang, label = `AI set — ${lang}`) {
+      if (!data) return;
+      studySetData = data;
+
+      const lesson = {
+        app: `AI generator • ${lang}`,
+        topic: data.topic || data.title || 'Generated study set',
+        summary: data.summary || '',
+        keywords: data.keywords || [],
+        notes: data.notes || [],
+        flashcards: (data.flashcards || []).map((card, idx) => ({
+          term: card.front || card.term || `Card ${idx + 1}`,
+          definition: card.back || card.definition || '',
+          hint: card.hint || ''
+        })),
+        mcq: (data.questions || []).map(q => ({
+          question: q.question,
+          options: q.options || [],
+          answer: typeof q.correct_index === 'number' ? q.correct_index : 0,
+          correct: q.explanation || '',
+          explanations: q.explanations || []
+        }))
+      };
+
+      renderLesson(lesson, label, { preserveStudySet: true });
+    }
+
+    function setLoading(on, text = '') {
+      const loader = document.getElementById('fcLoader');
+      const btn = document.getElementById('genBtn');
+      if (loader) loader.classList.toggle('hidden', !on);
+      if (btn) btn.disabled = on;
+      if (text && loader) {
+        const loaderTxt = document.getElementById('loaderTxt');
+        if (loaderTxt) loaderTxt.textContent = text;
+      }
+    }
+
+    function showErr(msg) {
+      const el = document.getElementById('errBox');
+      if (!el) return;
+      el.textContent = `⚠️ ${msg}`;
+      el.classList.remove('hidden');
+    }
+
+    function hideErr() {
+      const el = document.getElementById('errBox');
+      if (!el) return;
+      el.textContent = '';
+      el.classList.add('hidden');
+    }
+
+    async function pollSession() {
+      try {
+        const res = await fetch(`${API}/session`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.startTime) renderDash(data);
+      } catch (e) {
+        // ignore polling errors
+      }
+    }
+
+    function renderDash(s) {
+      const empty = document.getElementById('dashEmpty');
+      const content = document.getElementById('dashContent');
+      if (empty) empty.classList.add('hidden');
+      if (content) content.classList.remove('hidden');
+
+      if (s.startTime) {
+        const elapsed = Math.floor((Date.now() - s.startTime) / 1000);
+        document.getElementById('d-time').textContent = `${Math.floor(elapsed / 60)}m${elapsed % 60}s`;
+      } else {
+        document.getElementById('d-time').textContent = '—';
+      }
+
+      document.getElementById('d-spikes').textContent = s.confusionSpikes || 0;
+      document.getElementById('d-focus').textContent = `${s.focusScore ?? 100}%`;
+      document.getElementById('d-cards').textContent = (s.cardsDone || 0) + cardsDone;
+      if (sbSpikesSidebar) sbSpikesSidebar.textContent = s.confusionSpikes || 0;
+
+      const focusScore = s.focusScore ?? 100;
+      document.getElementById('focusVal').textContent = focusScore;
+      document.getElementById('focusFill').style.width = `${focusScore}%`;
+      document.getElementById('focusFill').style.background = focusScore > 70 ? 'var(--accent-3)' : focusScore > 40 ? 'var(--accent-4)' : 'var(--accent-2)';
+      if (focusValSidebar) focusValSidebar.textContent = `${focusScore}%`;
+
+      const pomos = s.pomodorosDone || 0;
+      document.getElementById('pomoCount').textContent = pomos;
+      document.getElementById('pomoToms').textContent = pomos > 0 ? '🍅'.repeat(Math.min(pomos, 10)) : '—';
+
+      document.getElementById('totalCards').textContent = (s.cardsDone || 0) + cardsDone;
+
+      const log = s.confusionLog || [];
+      const spikeLog = document.getElementById('spikeLog');
+      if (spikeLog) {
+        spikeLog.innerHTML = log.slice(-8).reverse().map(entry => {
+          const t = new Date(entry.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          const color = entry.score < 0.35 ? 'var(--accent-3)' : entry.score < 0.65 ? 'var(--accent-4)' : 'var(--accent-2)';
+          return `
+            <div class="spike-row">
+              <span class="spike-dot" style="background:${color}"></span>
+              <span class="spike-time">${t}</span>
+              <span class="spike-score">${entry.score.toFixed(2)}</span>
+            </div>
+          `;
+        }).join('') || '<div class="spike-empty">No spikes yet</div>';
+      }
+
+      if (log.length > 1) drawChart(log);
+    }
+
+    function drawChart(log) {
+      const svg = document.getElementById('confChart');
+      if (!svg) return;
+      const width = svg.parentElement.clientWidth || 300;
+      const height = 65;
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      const scores = log.map(e => e.score);
+      const points = scores.map((score, index) => {
+        const x = (index / (scores.length - 1 || 1)) * (width - 20) + 10;
+        const y = height - 8 - score * (height - 18);
+        return `${x},${y}`;
+      }).join(' ');
+      svg.innerHTML = `
+        <polyline points="${points}" fill="none" stroke="var(--accent-1)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" />
+        ${scores.map((score, index) => {
+          const x = (index / (scores.length - 1 || 1)) * (width - 20) + 10;
+          const y = height - 8 - score * (height - 18);
+          const color = score < 0.35 ? 'var(--accent-3)' : score < 0.65 ? 'var(--accent-4)' : 'var(--accent-2)';
+          return `<circle cx="${x}" cy="${y}" r="3" fill="${color}" />`;
+        }).join('')}
+      `;
+    }
+  </script>
 </body>
 </html>
