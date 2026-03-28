@@ -1,3 +1,4 @@
 config.js
 .env
 *.env
+background.js
