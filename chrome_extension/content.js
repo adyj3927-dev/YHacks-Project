@@ -196,6 +196,16 @@
       }, 5000);
     }
 
+    if (message.type === 'PULSE_WIDGET') {
+      // Flash the widget so user knows it's here
+      widget.style.boxShadow = '0 0 0 3px #721B06';
+      widget.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        widget.style.boxShadow = '';
+        widget.style.transform = '';
+      }, 1000);
+    }
+
     if (message.type === 'POMODORO_DONE') {
       document.getElementById('sb-status').textContent = '🍅 Break time!';
       document.getElementById('sb-timer').textContent  = '00:00';

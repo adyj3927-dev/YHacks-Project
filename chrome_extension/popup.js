@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 // popup.js — reads persistent state from chrome.storage
 // Camera runs in content.js, popup just displays the live data
-=======
-
-// popup.js
->>>>>>> f7e6882e1331264977bd465251afcde8f4293f2e
 
 // ── Elements ──────────────────────────────────────────────────────────────────
 const webcamFeed      = document.getElementById('webcamFeed');
@@ -213,14 +208,3 @@ syncBtn.addEventListener('click', async () => {
     }, 1500);
   }, 500);
 });
-<<<<<<< HEAD
-=======
-
-// ── Init ──────────────────────────────────────────────────────────────────────
-setInterval(loadSession, 3000);
-loadSession();
-renderTimer();
-chrome.storage.local.get(['session'], (res) => {
-  if (res.session?.active) startWebcam();
-});
->>>>>>> f7e6882e1331264977bd465251afcde8f4293f2e

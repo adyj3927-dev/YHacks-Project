@@ -5,8 +5,8 @@
   top: 16px;
   right: 16px;
   z-index: 2147483647;
-  background: #1e1e2e;
-  border: 1px solid #313244;
+  background:  #DBC4A5;
+  border: 1px solid #DBC4A5;
   border-radius: 12px;
   min-width: 180px;
   max-width: 200px;
@@ -32,19 +32,19 @@
 #sb-logo {
   font-size: 11px;
   font-weight: 600;
-  color: #cba6f7;
+  color:  #443223;
 }
 
 #sb-toggle {
   background: none;
   border: none;
-  color: #6c7086;
+  color: #FFF9F3;
   cursor: pointer;
   font-size: 14px;
   line-height: 1;
   padding: 0 2px;
 }
-#sb-toggle:hover { color: #cdd6f4; }
+#sb-toggle:hover { color: #44422D; }
 
 #sb-body { padding: 10px; }
 
@@ -59,7 +59,7 @@
   font-size: 22px;
   font-weight: 600;
   letter-spacing: 1px;
-  color: #cba6f7;
+  color:  #a08670;
   font-variant-numeric: tabular-nums;
 }
 
