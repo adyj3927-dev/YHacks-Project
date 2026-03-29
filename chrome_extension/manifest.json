@@ -26,6 +26,11 @@
       "run_at": "document_idle"
     },
     {
+      "matches": ["<all_urls>"],
+      "js": ["confusion_flashcards.js"],
+      "run_at": "document_idle"
+    },
+    {
       "matches": ["https://www.youtube.com/watch*"],
       "js": ["youtube.js"],
       "run_at": "document_idle"
