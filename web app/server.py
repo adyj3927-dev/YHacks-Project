@@ -58,7 +58,7 @@ def call_gemini(prompt: str) -> str:
         raise HTTPException(400, "GEMINI_API_KEY not set. Run: export GEMINI_API_KEY=your_key")
     client   = genai.Client(api_key=GEMINI_API_KEY)
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.0-flash",
         contents=prompt,
     )
     return response.text
@@ -171,7 +171,56 @@ def get_session():
         return json.loads(SESSION_FILE.read_text())
     return {}
 
+
+# ── /translate-text ───────────────────────────────────────────────────────────
+class TranslateTextRequest(BaseModel):
+    text:     str
+    language: str
+
+@app.post("/translate-text")
+def translate_text(req: TranslateTextRequest):
+    if req.language == "English":
+        return {"translated": req.text}
+    prompt = f"""Translate the following text into {req.language}.
+Preserve line breaks exactly — each line in the input must correspond to one line in the output.
+Return ONLY the translated text, no explanations.
+
+{req.text}"""
+    try:
+        result = call_gemini(prompt)
+        return {"translated": result.strip()}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
 # ── Run ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)
+
+# ── /generate-simple (low-bandwidth + simplified language) ───────────────────
+class SimplifyRequest(BaseModel):
+    text:     str
+    language: str = "English"
+    mode:     str = "normal"
+
+@app.post("/generate-simple")
+def generate_simple(req: SimplifyRequest):
+    if not req.text.strip():
+        raise HTTPException(400, "No text provided")
+
+    if req.mode == "low-bandwidth":
+        prompt = f"Study assistant. Generate in {req.language}. Be VERY brief.\nText: {req.text[:2000]}\nReturn ONLY JSON no markdown: {{\"summary\":\"1 sentence\",\"flashcards\":[{{\"front\":\"Q\",\"back\":\"A\",\"hint\":\"tip\"}},{{\"front\":\"Q\",\"back\":\"A\",\"hint\":\"tip\"}},{{\"front\":\"Q\",\"back\":\"A\",\"hint\":\"tip\"}}],\"questions\":[{{\"question\":\"Q\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"correct_index\":0,\"explanation\":\"why\"}}]}}"
+    else:
+        prompt = f"""You are a study assistant helping students who find reading difficult.
+Generate study material in {req.language} using VERY simple words (5th grade level).
+Use short sentences. Avoid jargon. Use everyday examples.
+Content: {req.text[:5000]}
+Return ONLY valid JSON no markdown:
+{{"summary":"1-2 simple sentences","flashcards":[{{"front":"simple question","back":"simple answer","hint":"easy tip"}},{{"front":"...","back":"...","hint":"..."}},{{"front":"...","back":"...","hint":"..."}}],"questions":[{{"question":"simple MCQ","options":["A","B","C","D"],"correct_index":0,"explanation":"simple reason"}},{{"question":"...","options":["...","...","...","..."],"correct_index":1,"explanation":"..."}}]}}"""
+
+    try:
+        raw  = call_gemini(prompt)
+        data = parse_json(raw)
+        return data
+    except Exception as e:
+        raise HTTPException(500, str(e))
