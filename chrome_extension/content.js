@@ -7,7 +7,7 @@
   widget.id = 'sb-widget';
   widget.innerHTML = `
     <div id="sb-header">
-      <span id="sb-logo">📖 StudyBuddy</span>
+      <span id="sb-logo">📖 AccessEd</span>
       <button id="sb-toggle">−</button>
     </div>
     <div id="sb-body">
@@ -81,7 +81,7 @@
         canvas.width = video.videoWidth; canvas.height = video.videoHeight;
         startDetectionLoop();
       };
-    } catch(e) { console.log('[StudyBuddy] Camera:', e.message); }
+    } catch(e) { console.log('[AccessEd] Camera:', e.message); }
   }
 
   function stopCamera() {
