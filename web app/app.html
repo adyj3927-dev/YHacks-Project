@@ -594,7 +594,7 @@
     const sbSpikesSidebar = document.getElementById('sb-spikes');
     const focusValSidebar = document.getElementById('focusValSidebar');
 
-    const API = 'http://localhost:8000';
+    const API = 'http://localhost:8001';
     const RTL = ['Urdu', 'Arabic'];
 
     let toastTimeout;
@@ -1275,7 +1275,19 @@
         const res = await fetch(`${API}/session`);
         if (!res.ok) return;
         const data = await res.json();
-        if (data && data.startTime) renderDash(data);
+        if (data && data.startTime) {
+          renderDash(data);
+          if (data.confusionSpikes !== undefined) {
+            confusionSpikes = data.confusionSpikes;
+            if (statSpikesEl) statSpikesEl.textContent = confusionSpikes;
+            if (sbSpikesSidebar) sbSpikesSidebar.textContent = confusionSpikes;
+          }
+          const log = data.confusionLog || [];
+          if (log.length > 0) updateConfusionDisplay(log[log.length - 1].score);
+          if (data.cardsDone !== undefined && sbCardsSidebar) {
+            sbCardsSidebar.textContent = (data.cardsDone || 0) + cardsDone;
+          }
+        }
       } catch (e) {
         // ignore polling errors
       }
