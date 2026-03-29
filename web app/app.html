@@ -1185,6 +1185,14 @@
           if (data.cardsDone !== undefined && sbCardsSidebar) {
             sbCardsSidebar.textContent = (data.cardsDone || 0) + cardsDone;
           }
+          // Sync time studied from extension startTime — stop local timer
+          if (data.startTime && statTimeEl) {
+            if (sessionTimer) { clearInterval(sessionTimer); sessionTimer = null; }
+            const elapsed = Math.floor((Date.now() - data.startTime) / 1000);
+            const mins = Math.floor(elapsed / 60);
+            const secs = elapsed % 60;
+            statTimeEl.textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+          }
         }
       } catch (e) {
         // ignore polling errors
