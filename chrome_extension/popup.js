@@ -192,7 +192,7 @@ pomoResetBtn.addEventListener('click', () => {
 
 // ── Open web app ──────────────────────────────────────────────────────────────
 openWebAppBtn.addEventListener('click', () => {
-  chrome.tabs.create({ url: 'http://localhost:8501' });
+  chrome.tabs.create({ url: 'http://localhost:8000' });
 });
 
 // ── Sync session ──────────────────────────────────────────────────────────────

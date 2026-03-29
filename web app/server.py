@@ -38,6 +38,7 @@ SESSION_FILE   = Path("/tmp/studybuddy_session.json")
 
 app = FastAPI(title="StudyBuddy API")
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -224,3 +225,6 @@ Return ONLY valid JSON no markdown:
         return data
     except Exception as e:
         raise HTTPException(500, str(e))
+
+        # ── Serve static files — MUST BE LAST ────────────────────────────────────────
+app.mount("/", StaticFiles(directory=".", html=True), name="static")
