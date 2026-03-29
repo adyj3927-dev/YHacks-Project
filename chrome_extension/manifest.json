@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "StudyBuddy",
   "version": "2.0",
-  "description": "Webcam confusion detector + Pomodoro timer for focused studying",
+  "description": "Webcam confusion detector + Pomodoro timer + YouTube translation",
   "permissions": [
     "activeTab",
     "scripting",
@@ -10,7 +10,11 @@
     "tabs",
     "alarms"
   ],
-  "host_permissions": ["<all_urls>", "http://localhost:8501/*"],
+  "host_permissions": [
+    "<all_urls>",
+    "http://localhost:8001/*",
+    "https://www.youtube.com/*"
+  ],
   "action": {
     "default_popup": "popup.html"
   },
@@ -20,6 +24,11 @@
       "js": ["content.js"],
       "css": ["widget.css"],
       "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://www.youtube.com/watch*"],
+      "js": ["youtube.js"],
+      "run_at": "document_idle"
     }
   ],
   "background": {
@@ -27,7 +36,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["popup.html"],
+      "resources": ["popup.html", "popup.js", "widget.css"],
       "matches": ["<all_urls>"]
     }
   ]
