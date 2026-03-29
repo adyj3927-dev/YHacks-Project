@@ -1249,3 +1249,64 @@ summary {
     flex: 1 1 160px;
   }
 }
+
+.img1 {
+  width: 19%;
+  max-width: 500px;         
+  padding: 16px;
+  position:absolute;
+  overflow: hidden;
+  z-index: 100;
+  right:0px;
+  bottom:0px;
+  font-size: 13px;
+
+}
+.img2 {
+  width: 18%;
+  max-width:500px;         
+  padding: 16px;
+  position:absolute;
+  overflow: hidden;
+  z-index: 100;
+  right:20px;
+  top:0px;
+  
+
+
+}
+
+.img3{
+  width: 15%;
+  max-width:500px;         
+  padding: 16px;
+  position:absolute;
+  overflow: hidden;
+  z-index: 100;
+  right:10px;
+  top:30px;
+  -ms-transform-origin-x: 90%;
+}
+
+.img5{width: 18%;
+  max-width:500px;         
+  padding: 16px;
+  position:absolute;
+  overflow: hidden;
+  z-index: 100;
+  right:00px;
+  top:0px;
+
+}
+.img6{
+  width: 14%;
+  max-width:500px;         
+  padding: 16px;
+  position:absolute;
+  overflow: hidden;
+  z-index: 100;
+  left:00px;
+  bottom:0px;
+
+}
+

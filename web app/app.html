@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>StudyBuddy — Notebook Edition</title>
+  <title>AccessEd</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,20 +18,26 @@
   <div class="parallax layer layer-front" data-speed="0.12"></div>
 
   <div class="scroll-hint" id="scroll-hint">
-    <span class="arrow">⬅︎</span> Scroll to explore
+    <span class="arrow"></span> Scroll to explore
   </div>
+  
 
   <div class="horizontal-viewport">
     <div class="scroll-track" id="scroll-track">
       <!-- Panel 1 -->
       <section class="panel hero">
+        <div class="homeimg">
+          <img class="img1" src="Imgs/img1.png">
+          <img class="img2" src="Imgs/booking.gif">
+          </div>
         <div class="panel-scroll">
-          <span class="stamp">Notebook Edition</span>
-          <h1>StudyBuddy</h1>
-          <p class="subtitle">Your AI study companion, stretched across one long horizontal notebook page.</p>
+          <span class="stamp"></span>
+          <h1>AccessEd</h1>
+          
+          <p class="subtitle">Your AI study companion, to make knowledge more accessible and easy.</p>
 
           <div class="status-line">
-            <span id="status-text">● Screen reading inactive — load something to begin</span>
+            <span id="status-text"></span>
           </div>
 
           <div class="stats-grid">
@@ -62,24 +68,18 @@
 
       <!-- Panel 2 -->
       <section class="panel setup">
+        
         <div class="panel-scroll">
-          <h2>Set up your study session</h2>
+          <h2></h2>
           <div class="setup-grid">
-            <article class="card">
-              <h3>Gemini API key (optional)</h3>
-              <label for="api-key">Store it here so you remember it later</label>
-              <input type="password" id="api-key" placeholder="sk-..." />
-              <small>You don’t need an API key for this demo. The Streamlit version uses it to make AI flashcards.</small>
-            </article>
+            
 
             <article class="card">
-              <h3>Manual content (fallback)</h3>
-              <small>Pick a demo lesson or paste your own text. Screen OCR isn’t available in this static build.</small>
+          
 
               <div class="radio-group">
                 <label><input type="radio" name="manual-mode" value="demo" checked /> Demo lesson</label>
                 <label><input type="radio" name="manual-mode" value="paste" /> Paste text</label>
-                <label><input type="radio" name="manual-mode" value="upload" /> Upload PDF (coming soon)</label>
               </div>
 
               <div id="manual-demo-panel">
@@ -107,6 +107,8 @@
 
       <!-- Panel 3 -->
       <section class="panel workspace">
+        <div class="homeimg">
+          <img class="img3" src="Imgs/img3.png"> </div>
         <div class="panel-scroll">
           <div id="focus-alert" class="focus-alert hidden">
             <h3>⚠️ Focus check!</h3>
@@ -198,9 +200,15 @@
 
       <!-- Panel 4 -->
       <section class="panel pro-panel">
+        <div class="homeimg">
+          <img class="img1" src="Imgs/img4.gif">
+          <img class="img5" src="Imgs/img5.png">
+          <img class="img6" src="Imgs/img6.png">
+          <img class="img5" src="Imgs/img5.png">
+          </div>
         <div class="panel-scroll">
           <header class="pro-header">
-            <h2>StudyBuddy Studio</h2>
+            <h2>AccessEd Studio</h2>
             <p>
               A polished builder for advanced sessions — recolored in our notebook palette and nestled into the horizontal flow. Generate AI flashcards, translate them, or sync stats from the Chrome extension.
             </p>
@@ -208,7 +216,7 @@
 
           <div class="pro-layout">
             <aside class="pro-sidebar">
-              <div class="pro-logo">📖 StudyBuddy</div>
+              <div class="pro-logo"> AccessEd</div>
               <button class="pro-nav active" data-page="flashcards" onclick="showPage('flashcards')"><span>🎴</span>Flashcards</button>
               <button class="pro-nav" data-page="dashboard" onclick="showPage('dashboard')"><span>📊</span>Dashboard</button>
               <button class="pro-nav" data-page="experiments" onclick="showPage('experiments')"><span>🧪</span>Experiments</button>
@@ -1345,5 +1353,6 @@
       `;
     }
   </script>
+
 </body>
 </html>
