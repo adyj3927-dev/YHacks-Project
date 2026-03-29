@@ -100,6 +100,7 @@
         Math.floor(canvas.width*0.5),  Math.floor(canvas.height*0.7)
       );
     } catch(e) { return; }
+
     const pixels = imageData.data;
     const n = pixels.length/4;
     let brightness=0, motionDelta=0;
@@ -110,21 +111,24 @@
       motionDelta/=n;
     }
     prevFrame = new Uint8Array(pixels);
+
     const raw = Math.min(1.0,
       (brightness<80?0.6:brightness<120?0.3:0) +
       (motionDelta>15?0.5:motionDelta>8?0.2:0) +
       Math.random()*0.08
     );
     confScore = confScore*0.85 + raw*0.15;
+
     try { chrome.storage.local.set({ confScore }); } catch(e) {}
     updateDot(confScore);
+
     const now = Date.now();
     if (confScore>0.65 && (now-lastSpikeTime)>20000 && sessionActive) {
       lastSpikeTime = now;
       try { chrome.runtime.sendMessage({ type:'CONFUSION_SPIKE', score:confScore }); } catch(e) {}
       widget.style.boxShadow = '0 0 0 2px #f38ba8';
       const msg = document.getElementById('sb-spike-msg');
-      if (msg) { msg.style.display='block'; setTimeout(()=>{ widget.style.boxShadow=''; msg.style.display='none'; },5000); }
+      if (msg) { msg.style.display='block'; msg.style.cursor='pointer'; msg.onclick=()=>{ try { chrome.runtime.sendMessage({ type:'OPEN_WEBAPP' }); } catch(e) {} }; setTimeout(()=>{ widget.style.boxShadow=''; msg.style.display='none'; },5000); }
     }
   }
 
@@ -147,7 +151,7 @@
       if (message.type==='CONFUSION_SPIKE') {
         updateDot(message.score);
         const msg=document.getElementById('sb-spike-msg');
-        if(msg){ msg.style.display='block'; widget.style.boxShadow='0 0 0 2px #f38ba8';
+        if(msg){ msg.style.display='block'; msg.style.cursor='pointer'; msg.onclick=()=>{ try { chrome.runtime.sendMessage({ type:'OPEN_WEBAPP' }); } catch(e) {} }; widget.style.boxShadow='0 0 0 2px #f38ba8';
           setTimeout(()=>{ widget.style.boxShadow=''; msg.style.display='none'; },5000); }
       }
       if (message.type==='PULSE_WIDGET') {
@@ -163,7 +167,7 @@
     });
   } catch(e) {}
 
-  // ── Timer — calculates from start time ───────────────────────────────────
+  // ── Timer — calculates from start time so it's always accurate ────────────
   function timerTick() {
     try {
       chrome.storage.local.get(['pomoRunning','pomoStartedAt','pomoTotalSecs'], (res) => {

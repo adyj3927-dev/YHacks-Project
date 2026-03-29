@@ -54,6 +54,7 @@ def serve_frontend():
 
 @app.get("/styles.css")
 def serve_css():
+    
     return FileResponse("styles.css")
 # ── Gemini helper ─────────────────────────────────────────────────────────────
 def call_gemini(prompt: str) -> str:

@@ -63,137 +63,17 @@
             <button id="simulate-confusion-btn" class="accent-btn">⚡ Simulate confusion spike</button>
             <button id="simulate-focus-btn" class="danger-btn">👁 Simulate focus lost</button>
           </div>
-        </div>
-      </section>
 
-      <!-- Panel 2 -->
-      <section class="panel setup">
-        
-        <div class="panel-scroll">
-          <h2></h2>
-          <div class="setup-grid">
-            
-
-            <article class="card">
-          
-
-              <div class="radio-group">
-                <label><input type="radio" name="manual-mode" value="demo" checked /> Demo lesson</label>
-                <label><input type="radio" name="manual-mode" value="paste" /> Paste text</label>
-              </div>
-
-              <div id="manual-demo-panel">
-                <label for="demo-topic">Topic</label>
-                <select id="demo-topic">
-                  <option value="photosynthesis">Photosynthesis (Biology)</option>
-                  <option value="newton_laws">Newton’s Laws (Physics)</option>
-                </select>
-                <button id="load-demo-btn" class="accent-btn demo-btn">Load demo lesson</button>
-              </div>
-
-              <div id="manual-paste-panel" class="hidden">
-                <label for="manual-text">Paste your study text</label>
-                <textarea id="manual-text" placeholder="Paste a paragraph or two…"></textarea>
-                <button id="use-text-btn" class="accent-btn paste-btn">Use this text</button>
-              </div>
-
-              <div id="manual-upload-panel" class="hidden">
-                <small>PDF parsing isn’t built into this notebook port yet. Stick with the demo lessons or pasted text for now!</small>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <!-- Panel 3 -->
-      <section class="panel workspace">
-        <div class="homeimg">
-          <img class="img3" src="Imgs/img3.png"> </div>
-        <div class="panel-scroll">
-          <div id="focus-alert" class="focus-alert hidden">
-            <h3>⚠️ Focus check!</h3>
-            <p>You switched away from your study material. Come back — your session is still running.</p>
-            <button id="focus-dismiss-btn" class="accent-btn">I'm back — dismiss</button>
-          </div>
-
-          <div class="screen-wrap">
-            <h2>🖥 What you're studying right now</h2>
-            <div id="screen-panel" class="screen-panel">
-              <div class="panel-placeholder">
-                <div class="placeholder-emoji">👀</div>
-                <div class="placeholder-text">
-                  Waiting for content… Load a demo lesson, paste text, or generate cards with the Studio panel.
-                </div>
+          <div style="margin-top:24px;background:rgba(255,249,243,0.94);border:1px solid var(--panel-border);border-radius:20px;padding:20px 24px;box-shadow:var(--shadow-soft);display:flex;flex-direction:column;gap:14px;">
+            <h3 style="font-size:16px;">👁 Attention</h3>
+            <div id="confusion-badge-hero" class="score-badge score-low">Confusion: low (0.00)</div>
+            <div class="conf-bar-wrap">
+              <div class="conf-label">Confusion level</div>
+              <div class="conf-bar-bg">
+                <div id="confusion-bar-hero" class="conf-bar-fill" style="width:12%"></div>
               </div>
             </div>
-          </div>
-
-          <div class="flash-attention">
-            <section class="flashcards">
-              <h2>📚 Flashcards &amp; checks</h2>
-              <div id="flashcard-section" class="flashcard-section hidden">
-                <div id="summary-box" class="summary-box hidden"></div>
-
-                <div id="flash-tabs" class="flash-tabs hidden">
-                  <button type="button" class="flash-tab active" data-tab="cards">Flashcards</button>
-                  <button type="button" class="flash-tab" data-tab="quiz">Quick quiz</button>
-                </div>
-
-                <div id="cards-pane" class="cards-pane hidden">
-                  <div class="flashcard-interactive">
-                    <div class="fc-meta">
-                      <span id="fc-counter" class="fc-counter">Card 1 of 1</span>
-                      <span id="fc-progress" class="fc-progress hidden"></span>
-                    </div>
-                    <div class="fc-instruction">Tap the card to flip it</div>
-                    <div class="fc-wrap" id="fc-wrap">
-                      <div class="fc-inner" id="fc-inner">
-                        <div class="fc-face fc-front">
-                          <span class="fc-label">Question</span>
-                          <p id="fc-front">—</p>
-                        </div>
-                        <div class="fc-face fc-back">
-                          <span class="fc-label">Answer</span>
-                          <p id="fc-back">—</p>
-                          <span class="fc-hint hidden" id="fc-hint"></span>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="fc-nav">
-                      <button type="button" class="secondary-btn fc-btn" id="fc-prev">← Prev</button>
-                      <button type="button" class="accent-btn fc-btn" id="fc-got">✅ Got it!</button>
-                      <button type="button" class="secondary-btn fc-btn" id="fc-next">Next →</button>
-                    </div>
-                  </div>
-
-                  <div id="flashcard-list" class="flashcard-list"></div>
-                </div>
-
-                <div id="quiz-pane" class="quiz-pane hidden">
-                  <div class="quiz-meta">
-                    <span id="mcq-counter" class="mcq-counter">Question 1 of 1</span>
-                  </div>
-                  <div id="mcq-question" class="mcq-question"></div>
-                  <div id="mcq-options" class="quiz-options"></div>
-                  <div class="feedback hidden" id="mcq-feedback"></div>
-                  <button type="button" class="secondary-btn next-btn hidden" id="mcq-next">Next question →</button>
-                </div>
-              </div>
-            </section>
-
-            <aside class="attention-card">
-              <h3>👁 Attention</h3>
-              <div id="confusion-badge" class="score-badge score-low">Confusion: low (0.12)</div>
-              <div class="conf-bar-wrap">
-                <div class="conf-label">Confusion level</div>
-                <div class="conf-bar-bg">
-                  <div id="confusion-bar" class="conf-bar-fill"></div>
-                </div>
-              </div>
-              <small class="cam-note">
-                Webcam analytics aren’t available in this static build. Use the buttons on the first panel to simulate spikes or focus loss.
-              </small>
-            </aside>
+            <small class="cam-note">Live from Chrome extension · start a session to activate</small>
           </div>
         </div>
       </section>
@@ -397,6 +277,22 @@
 
   <div id="scroll-space"></div>
 
+
+  <!-- Flashcard bottom drawer -->
+  <div id="fc-drawer">
+    <div id="fc-drawer-handle" onclick="closeDrawer()"></div>
+    <div id="fc-drawer-header">
+      <div id="fc-drawer-title">📚 Flashcards</div>
+      <button id="fc-drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+    <div id="fc-drawer-tabs">
+      <button class="fc-drawer-tab active" onclick="setDrawerTab('cards')">Cards</button>
+      <button class="fc-drawer-tab" onclick="setDrawerTab('quiz')">Quiz</button>
+    </div>
+    <div id="fc-drawer-cards"></div>
+    <div id="fc-drawer-quiz" style="display:none"></div>
+  </div>
+
   <div id="toast" class="toast hidden"></div>
 
   <script>
@@ -452,25 +348,7 @@
 
     /* ---- StudyBuddy logic ---- */
 
-    const manualPanels = {
-      demo: document.getElementById('manual-demo-panel'),
-      paste: document.getElementById('manual-paste-panel'),
-      upload: document.getElementById('manual-upload-panel')
-    };
 
-    function updateManualPanels(value) {
-      Object.entries(manualPanels).forEach(([key, panel]) => {
-        panel.classList.toggle('hidden', key !== value);
-      });
-    }
-
-    document.querySelectorAll('input[name="manual-mode"]').forEach(radio => {
-      radio.addEventListener('change', (e) => {
-        updateManualPanels(e.target.value);
-      });
-    });
-
-    updateManualPanels(document.querySelector('input[name="manual-mode"]:checked').value);
 
     const demoLessons = {
       photosynthesis: {
@@ -1039,6 +917,21 @@
       showToast('Nice! Focus alert dismissed.', 'success');
     });
 
+
+    function updateHeroConfusion(level) {
+      const badge = document.getElementById('confusion-badge-hero');
+      const bar   = document.getElementById('confusion-bar-hero');
+      if (!badge || !bar) return;
+      const pct = Math.max(5, Math.min(100, Math.round(level * 100)));
+      bar.style.width = `${pct}%`;
+      let cls = 'score-low', color = 'var(--accent-3)';
+      if (pct > 66) { cls = 'score-high'; color = 'var(--accent-2)'; }
+      else if (pct > 33) { cls = 'score-medium'; color = 'var(--accent-4)'; }
+      badge.className = `score-badge ${cls}`;
+      badge.textContent = `Confusion: ${cls.split('-')[1]} (${level.toFixed(2)})`;
+      bar.style.background = color;
+    }
+
     function updateConfusionDisplay(level) {
       const percentage = Math.max(5, Math.min(100, Math.round(level * 100)));
       confusionBar.style.width = `${percentage}%`;
@@ -1221,6 +1114,16 @@
     function renderSet(data, lang, label = `AI set — ${lang}`) {
       if (!data) return;
       studySetData = data;
+      // Open flashcard drawer at bottom
+      const cards = (data.flashcards || []).map(c => ({
+        term: c.front || c.term || '', definition: c.back || c.definition || '', hint: c.hint || ''
+      }));
+      const qs = (data.questions || []).map(q => ({
+        question: q.question, options: q.options || [],
+        correct_index: typeof q.correct_index === 'number' ? q.correct_index : 0,
+        explanation: q.explanation || '', correct: q.explanation || ''
+      }));
+      openDrawer(cards, qs, data.summary || '');
 
       const lesson = {
         app: `AI generator • ${lang}`,
@@ -1283,7 +1186,10 @@
             if (sbSpikesSidebar) sbSpikesSidebar.textContent = confusionSpikes;
           }
           const log = data.confusionLog || [];
-          if (log.length > 0) updateConfusionDisplay(log[log.length - 1].score);
+          if (log.length > 0) {
+            updateConfusionDisplay(log[log.length - 1].score);
+            updateHeroConfusion(log[log.length - 1].score);
+          }
           if (data.cardsDone !== undefined && sbCardsSidebar) {
             sbCardsSidebar.textContent = (data.cardsDone || 0) + cardsDone;
           }
@@ -1340,6 +1246,107 @@
       }
 
       if (log.length > 1) drawChart(log);
+    }
+
+
+    // ── Flashcard bottom drawer ───────────────────────────────────────────────
+    let drawerCards = [];
+    let drawerQuestions = [];
+    let drawerFlipped = {};
+    let drawerMcqIdx = 0;
+    let drawerMcqDone = false;
+
+    function openDrawer(cards, questions, summary) {
+      drawerCards = cards;
+      drawerQuestions = questions;
+      drawerFlipped = {};
+      drawerMcqIdx = 0;
+      drawerMcqDone = false;
+
+      const drawer = document.getElementById('fc-drawer');
+      drawer.style.display = 'block';
+      requestAnimationFrame(() => drawer.classList.add('open'));
+
+      if (summary) {
+        const title = document.getElementById('fc-drawer-title');
+        title.textContent = '📚 ' + (summary.slice(0, 60) + (summary.length > 60 ? '…' : ''));
+      }
+
+      renderDrawerCards();
+      renderDrawerQuiz();
+      setDrawerTab('cards');
+    }
+
+    function closeDrawer() {
+      const drawer = document.getElementById('fc-drawer');
+      drawer.classList.remove('open');
+      setTimeout(() => { drawer.style.display = 'none'; }, 400);
+    }
+
+    function setDrawerTab(tab) {
+      document.querySelectorAll('.fc-drawer-tab').forEach((b, i) =>
+        b.classList.toggle('active', ['cards','quiz'][i] === tab));
+      document.getElementById('fc-drawer-cards').style.display = tab === 'cards' ? 'flex' : 'none';
+      document.getElementById('fc-drawer-quiz').style.display  = tab === 'quiz'  ? 'flex' : 'none';
+    }
+
+    function renderDrawerCards() {
+      const container = document.getElementById('fc-drawer-cards');
+      container.innerHTML = drawerCards.map((card, i) => `
+        <div class="drawer-card ${drawerFlipped[i] ? 'flipped' : ''}" onclick="flipDrawerCard(${i})">
+          <div class="drawer-card-label">${drawerFlipped[i] ? 'Answer' : 'Question'}</div>
+          <div class="drawer-card-text">${drawerFlipped[i] ? (card.definition || card.back) : (card.term || card.front)}</div>
+          ${drawerFlipped[i] && (card.hint) ? `<div class="drawer-card-hint">💡 ${card.hint}</div>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function flipDrawerCard(i) {
+      drawerFlipped[i] = !drawerFlipped[i];
+      renderDrawerCards();
+    }
+
+    function renderDrawerQuiz() {
+      if (!drawerQuestions.length) return;
+      const q = drawerQuestions[drawerMcqIdx];
+      const container = document.getElementById('fc-drawer-quiz');
+      container.innerHTML = `
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:6px">
+          Question ${drawerMcqIdx+1} of ${drawerQuestions.length}
+        </div>
+        <div class="drawer-mcq-q">${q.question}</div>
+        <div class="drawer-mcq-opts">
+          ${q.options.map((o,i) => `
+            <button class="drawer-opt" onclick="answerDrawer(${i})" data-i="${i}">
+              <span style="font-family:'DM Serif Display',serif;color:var(--accent-1);min-width:18px">${'ABCD'[i]}.</span>
+              <span>${o}</span>
+            </button>
+          `).join('')}
+        </div>
+        <div id="drawer-exp" style="display:none;font-size:13px;color:var(--text-secondary);padding:10px 14px;background:rgba(219,196,165,0.25);border-radius:12px;line-height:1.5"></div>
+        ${drawerMcqIdx < drawerQuestions.length-1 ? '<button onclick="nextDrawerQ()" style="align-self:flex-end;margin-top:4px;display:none" id="drawer-next-btn">Next →</button>' : ''}
+      `;
+    }
+
+    function answerDrawer(chosen) {
+      if (drawerMcqDone) return;
+      drawerMcqDone = true;
+      const q = drawerQuestions[drawerMcqIdx];
+      document.querySelectorAll('.drawer-opt').forEach((el, i) => {
+        el.disabled = true;
+        if (i === q.correct_index) el.classList.add('correct');
+        else if (i === chosen) el.classList.add('wrong');
+      });
+      const exp = document.getElementById('drawer-exp');
+      if (exp) { exp.textContent = q.explanation || q.correct || ''; exp.style.display = 'block'; }
+      const nextBtn = document.getElementById('drawer-next-btn');
+      if (nextBtn) nextBtn.style.display = 'inline-block';
+    }
+
+    function nextDrawerQ() {
+      drawerMcqIdx++;
+      drawerMcqDone = false;
+      renderDrawerQuiz();
     }
 
     function drawChart(log) {
