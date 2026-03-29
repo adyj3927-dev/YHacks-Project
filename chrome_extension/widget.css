@@ -5,13 +5,13 @@
   top: 16px;
   right: 16px;
   z-index: 2147483647;
-  background:  #fddaf2;
-  border: 1px solid #DBC4A5;
+  background:  #DBC4A5;
+  border: 1px solid #443223;
   border-radius: 12px;
   min-width: 180px;
   max-width: 200px;
-  font-family: 'DM Sans', -apple-system, sans-serif;
-  font-size: 12px;
+  font-family: 'Playfair Display',serif;
+  font-size: 20px;
   color: #cdd6f4;
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   transition: box-shadow 0.3s ease;
@@ -59,7 +59,7 @@
   font-size: 22px;
   font-weight: 600;
   letter-spacing: 1px;
-  color:  #a08670;
+  color:  #72583E;
   font-variant-numeric: tabular-nums;
 }
 
@@ -67,7 +67,7 @@
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: #a6e3a1;
+  background: #44422D;
   transition: background 0.4s ease;
   flex-shrink: 0;
 }
@@ -83,7 +83,7 @@
   border-radius: 4px;
   height: 4px;
   width: 0%;
-  background: #a6e3a1;
+  background: #7c7960;
   transition: width 0.4s ease, background 0.4s ease;
 }
 
@@ -100,7 +100,7 @@
   border-radius: 6px;
   padding: 5px 7px;
   font-size: 10px;
-  color: #f38ba8;
+  color: #755151;
   line-height: 1.4;
   cursor: pointer;
 }

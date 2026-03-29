@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8"/>
   <meta http-equiv="Permissions-Policy" content="camera=*">
-  <title>StudyBuddy</title>
+  <title>AccessEd</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --clockwork: #721B06;
+      --clockwork: #72583E;
       --deep-olive: #444210;
       --cafe-noir: #443222;
       --weathered: #888676;
       --linen: #F7F5F3;
-      --success: #2d6a4f;
-      --danger: #c0392b;
+      --success: #44422D;
+      --danger: #755151;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -63,18 +63,18 @@
     .status-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
     .status-pill { display:inline-flex; align-items:center; gap:5px; background:white; border:1px solid rgba(114,27,6,0.2); border-radius:20px; padding:3px 10px; font-size:11px; color:var(--weathered); }
     .dot { width:7px; height:7px; border-radius:50%; background:var(--weathered); }
-    .dot.green  { background:#4caf50; }
-    .dot.red    { background:#f38ba8; }
-    .dot.orange { background:#fab387; }
+    .dot.green  { background:#44422D; }
+    .dot.red    { background:#755151; }
+    .dot.orange { background:#a08670; }
     .section-label { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--weathered); margin-bottom:6px; }
     .divider { height:1px; background:rgba(114,27,6,0.1); margin:10px 0; }
-    #camError { display:none; background:#fff0f0; border:1px solid #f5c6cb; border-radius:8px; padding:10px; font-size:12px; color:var(--danger); text-align:center; margin-bottom:10px; }
+    #camError { display:none; background: #DBC4A5;; border:1px solid #FFF9F3; border-radius:8px; padding:10px; font-size:12px; color:var(--danger); text-align:center; margin-bottom:10px; }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <h1>StudyBuddy 📖</h1>
+    <h1>AccessEd</h1>
     <p>Focus · Learn · Grow</p>
   </div>
 
@@ -91,14 +91,14 @@
     <video id="webcamFeed" autoplay muted playsinline></video>
     <div class="cam-overlay">
       <span class="conf-label">Confusion score</span>
-      <span class="conf-value" id="confValue" style="color:#a6e3a1">0.00</span>
+      <span class="conf-value" id="confValue" style="color:#44422D">0.00</span>
     </div>
   </div>
   <div id="camError">Could not access webcam. Please allow camera permission and refresh.</div>
 
   <div class="conf-bar-wrap">
     <div class="conf-bar-bg">
-      <div class="conf-bar-fill" id="confBar" style="width:0%;background:#a6e3a1;"></div>
+      <div class="conf-bar-fill" id="confBar" style="width:0%;background:#333108;"></div>
     </div>
     <div class="conf-status">
       <span id="confLabel">Calm</span>
@@ -111,7 +111,7 @@
   <div class="section-label">Pomodoro timer</div>
   <div class="pomo-card">
     <div class="pomo-header">
-      <span class="pomo-title">🍅 Focus session</span>
+      <span class="pomo-title">Focus session</span>
       <span class="pomo-done" id="pomoDone">0 done today</span>
     </div>
     <div class="pomo-len">
@@ -137,8 +137,8 @@
 
   <div class="divider"></div>
 
-  <button class="btn btn-olive" id="openWebAppBtn">🚀 Open StudyBuddy App</button>
-  <button class="btn btn-secondary" id="syncBtn">📤 Sync session to app</button>
+  <button class="btn btn-olive" id="openWebAppBtn"> Open AccessEd App</button>
+  <button class="btn btn-secondary" id="syncBtn">Sync session to app</button>
 
   <script src="popup.js"></script>
 </body>

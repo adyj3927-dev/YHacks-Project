@@ -133,7 +133,7 @@ function updateStatsUI(session) {
 }
 
 function updateConfusionUI(score) {
-  const color = score < 0.35 ? '#a6e3a1' : score < 0.65 ? '#fab387' : '#f38ba8';
+  const color = score < 0.35 ? '#44422D' : score < 0.65 ? '#a16743' : '#8d4459';
   const label = score < 0.35 ? 'Calm' : score < 0.65 ? 'Uncertain' : 'Confused';
   const tip   = score < 0.35 ? 'Keep it up!' : score < 0.65 ? 'Stay focused' : 'Take a breath';
 
@@ -192,7 +192,7 @@ pomoResetBtn.addEventListener('click', () => {
 
 // ── Open web app ──────────────────────────────────────────────────────────────
 openWebAppBtn.addEventListener('click', () => {
-  chrome.tabs.create({ url: 'http://localhost:8000' });
+  chrome.tabs.create({ url: 'http://localhost:8501' });
 });
 
 // ── Sync session ──────────────────────────────────────────────────────────────
@@ -201,9 +201,9 @@ syncBtn.addEventListener('click', async () => {
   syncBtn.disabled = true;
   await chrome.runtime.sendMessage({ type: 'SEND_TO_WEBAPP' });
   setTimeout(() => {
-    syncBtn.textContent = '✅ Synced!';
+    syncBtn.textContent = 'Synced!';
     setTimeout(() => {
-      syncBtn.textContent = '📤 Sync session to app';
+      syncBtn.textContent = 'Sync session to app';
       syncBtn.disabled = false;
     }, 1500);
   }, 500);
