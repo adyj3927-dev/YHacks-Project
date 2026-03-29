@@ -51,6 +51,10 @@ app.add_middleware(
 def serve_frontend():
     return FileResponse("app.html")
 
+
+@app.get("/styles.css")
+def serve_css():
+    return FileResponse("styles.css")
 # ── Gemini helper ─────────────────────────────────────────────────────────────
 def call_gemini(prompt: str) -> str:
     if not GENAI_AVAILABLE:
@@ -227,4 +231,3 @@ Return ONLY valid JSON no markdown:
         raise HTTPException(500, str(e))
 
         # ── Serve static files — MUST BE LAST ────────────────────────────────────────
-app.mount("/", StaticFiles(directory=".", html=True), name="static")
