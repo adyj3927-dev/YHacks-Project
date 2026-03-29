@@ -60,8 +60,8 @@
     el.innerHTML = `
       <div style="text-align:center;padding:20px">
         <div style="font-size:28px;margin-bottom:12px">🧠</div>
-        <div style="font-size:14px;color:#cdd6f4;margin-bottom:6px">Confusion detected!</div>
-        <div style="font-size:12px;color:#6c7086">Generating flashcards in ${lang}…</div>
+        <div style="font-size:14px;color:#443223;margin-bottom:6px">Confusion detected!</div>
+        <div style="font-size:12px;color:#888676">Generating flashcards in ${lang}…</div>
         <div style="margin-top:16px;width:30px;height:30px;border:2px solid #313244;border-top-color:#cba6f7;border-radius:50%;animation:sb-spin .8s linear infinite;margin:16px auto 0"></div>
       </div>
       <style>@keyframes sb-spin{to{transform:rotate(360deg)}}</style>
@@ -96,9 +96,9 @@
       overlay.innerHTML = `
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#cba6f7">🧠 Confusion · ${lang}</div>
-          <button id="sb-close" style="background:none;border:none;color:#6c7086;cursor:pointer;font-size:18px;line-height:1;padding:2px 6px">✕</button>
+          <button id="sb-close" style="background:none;border:none;color:#888676;cursor:pointer;font-size:18px;line-height:1;padding:2px 6px">✕</button>
         </div>
-        ${summary ? `<div style="font-size:12px;color:#6c7086;font-style:italic;margin-bottom:12px;line-height:1.5;padding:8px;background:#181825;border-radius:8px">${summary}</div>` : ''}
+        ${summary ? `<div style="font-size:12px;color:#888676;font-style:italic;margin-bottom:12px;line-height:1.5;padding:8px;background:#F7F5F3;border-radius:8px">${summary}</div>` : ''}
 
         <div style="display:flex;gap:6px;margin-bottom:12px">
           <button id="sb-tab-cards" style="${tabStyle(activeTab==='cards')}">Flashcards</button>
@@ -106,10 +106,10 @@
         </div>
 
         ${activeTab === 'cards' ? `
-          <div style="font-size:11px;color:#6c7086;text-align:center;margin-bottom:6px">Tap to flip · Card ${fcIdx+1} of ${cards.length}</div>
-          <div id="sb-card" style="background:#2a2a3e;border:1px solid #45475a;border-radius:12px;padding:18px;min-height:90px;cursor:pointer;margin-bottom:12px;transition:background .2s">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6c7086;margin-bottom:8px" id="sb-card-lbl">${flipped?'Answer':'Question'}</div>
-            <div style="font-size:15px;color:#cdd6f4;line-height:1.5" id="sb-card-txt">${flipped ? card.back + (card.hint?` <span style="font-size:12px;color:#c9a96e;display:block;margin-top:8px">💡 ${card.hint}</span>`:'') : card.front}</div>
+          <div style="font-size:11px;color:#888676;text-align:center;margin-bottom:6px">Tap to flip · Card ${fcIdx+1} of ${cards.length}</div>
+          <div id="sb-card" style="background:#EDE3D6;border:1px solid #45475a;border-radius:12px;padding:18px;min-height:90px;cursor:pointer;margin-bottom:12px;transition:background .2s">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#888676;margin-bottom:8px" id="sb-card-lbl">${flipped?'Answer':'Question'}</div>
+            <div style="font-size:15px;color:#443223;line-height:1.5" id="sb-card-txt">${flipped ? card.back + (card.hint?` <span style="font-size:12px;color:#c9a96e;display:block;margin-top:8px">💡 ${card.hint}</span>`:'') : card.front}</div>
           </div>
           <div style="display:flex;gap:8px">
             <button id="sb-prev" style="${navBtnStyle()}">← Prev</button>
@@ -117,12 +117,12 @@
             <button id="sb-next" style="${navBtnStyle()}">Next →</button>
           </div>
         ` : `
-          <div style="font-size:11px;color:#6c7086;margin-bottom:10px">Question ${mcqIdx+1} of ${questions.length}</div>
-          <div style="font-size:14px;color:#cdd6f4;margin-bottom:12px;line-height:1.5">${q.question}</div>
+          <div style="font-size:11px;color:#888676;margin-bottom:10px">Question ${mcqIdx+1} of ${questions.length}</div>
+          <div style="font-size:14px;color:#443223;margin-bottom:12px;line-height:1.5">${q.question}</div>
           <div id="sb-opts">
             ${q.options.map((o,i)=>`<div class="sb-opt" data-i="${i}" style="${optStyle()}">${'ABCD'[i]}. ${o}</div>`).join('')}
           </div>
-          <div id="sb-exp" style="display:none;font-size:12px;color:#6c7086;margin-top:10px;padding:8px;background:#181825;border-radius:8px;line-height:1.5"></div>
+          <div id="sb-exp" style="display:none;font-size:12px;color:#888676;margin-top:10px;padding:8px;background:#F7F5F3;border-radius:8px;line-height:1.5"></div>
           ${mcqIdx < questions.length-1 ? `<button id="sb-next-q" style="${navBtnStyle()};width:100%;margin-top:10px;display:none">Next question →</button>` : ''}
         `}
       `;
@@ -174,14 +174,14 @@
 
   // ── Style helpers ─────────────────────────────────────────────────────────
   function overlayBaseStyle() {
-    return `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#1e1e2e;border:1.5px solid #45475a;border-radius:16px;padding:22px 26px;width:380px;max-width:90vw;z-index:2147483646;box-shadow:0 20px 60px rgba(0,0,0,0.6);font-family:'DM Sans',sans-serif;`;
+    return `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#FFF9F3;border:1.5px solid rgba(114,88,62,0.3);border-radius:16px;padding:22px 26px;width:380px;max-width:90vw;z-index:2147483646;box-shadow:0 20px 60px rgba(0,0,0,0.6);font-family:'DM Sans',sans-serif;`;
   }
   function tabStyle(active) {
     return `flex:1;padding:6px 14px;border-radius:20px;border:${active?'1px solid #cba6f7':'1px solid #313244'};background:${active?'rgba(203,166,247,.15)':'none'};color:${active?'#cba6f7':'#6c7086'};font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;`;
   }
   function navBtnStyle(type='') {
     const styles = {
-      '':      'flex:1;padding:8px;border-radius:8px;border:1px solid #313244;background:#181825;color:#a6adc8;font-size:12px;cursor:pointer;font-family:\'DM Sans\',sans-serif',
+      '':      'flex:1;padding:8px;border-radius:8px;border:1px solid #313244;background:#F7F5F3;color:#443223;font-size:12px;cursor:pointer;font-family:\'DM Sans\',sans-serif',
       'green': 'flex:1;padding:8px;border-radius:8px;border:1px solid rgba(111,207,151,.3);background:rgba(111,207,151,.1);color:#6fcf97;font-size:12px;cursor:pointer;font-family:\'DM Sans\',sans-serif',
     };
     return styles[type] || styles[''];
@@ -190,7 +190,7 @@
     const base = 'display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:8px;font-size:13px;cursor:pointer;margin-bottom:5px;line-height:1.4;font-family:\'DM Sans\',sans-serif;';
     if (state==='correct') return base+'border:1px solid rgba(111,207,151,.3);background:rgba(111,207,151,.08);color:#6fcf97;';
     if (state==='wrong')   return base+'border:1px solid rgba(235,87,87,.3);background:rgba(235,87,87,.08);color:#eb5757;';
-    return base+'border:1px solid #313244;background:#181825;color:#a6adc8;';
+    return base+'border:1px solid #313244;background:#F7F5F3;color:#443223;';
   }
 
   // ── Listen for confusion spike message ────────────────────────────────────

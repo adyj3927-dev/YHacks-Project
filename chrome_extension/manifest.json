@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "StudyBuddy",
+  "name": "AccessEd",
   "version": "2.0",
   "description": "Webcam confusion detector + Pomodoro timer + YouTube translation",
   "permissions": [
